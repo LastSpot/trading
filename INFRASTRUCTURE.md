@@ -67,11 +67,13 @@ tax-sheltered wrapper.
 |---|---|
 | Want minimum change, trust your own discipline | **A** — Fidelity + signal-only automation |
 | Taxable account, want true hands-off | **B** — Alpaca with the strategy capital only |
-| Can run this inside an IRA (best after-tax result) | **C** — IBKR IRA |
+| Money already inside an IRA | **C** — IBKR IRA |
 
-A sane path: start with **Option A for 1–3 months** (the signal engine is
-identical in all three options), then move the strategy sleeve to Alpaca/IBKR
-once you trust the pipeline.
+**Decided path (see §7 for the tax reasoning): taxable account, 10-year
+horizon.** Start with **Option A for 1–3 months** — the signal engine is
+identical in all three options — then move the strategy capital to a
+dedicated taxable account at **Alpaca (B)**, or **IBKR (C)** if the year-two
+futures upgrade in §7 is appealing.
 
 ---
 
@@ -320,20 +322,64 @@ IBKR: `MOC` order type) or next-open market orders.
 
 ---
 
-## 7. Taxes and account placement (bigger than all infra costs combined)
+## 7. Taxes and account placement — DECIDED: taxable account, 10-year horizon
 
-- ~23 order events/yr → mostly **short-term capital gains** in a taxable
-  account. At a 30%+ marginal rate this eats roughly a third of the edge over
-  buy-and-hold QQQ.
-- **Best structure: run the strategy inside an IRA.** Fidelity IRA works for
-  Option A (manual execution). **IBKR IRA (Option C) is the only mainstream
-  full-automation + IRA combination.**
-- If taxable is the only option, the strategy still dominates holding TQQQ
-  outright on after-tax survival terms — but expect the realized edge vs
-  plain QQQ to compress.
-- Keep the strategy in its **own account** regardless of broker. Mixing
-  discretionary holdings with a systematic book breaks reconciliation and
-  invites tinkering.
+**Decision (Jul 2026): run the strategy in a dedicated taxable brokerage
+account.** An IRA is the wrong wrapper here twice over: the capital is
+planned for use in ~10 years (pre-59½ withdrawals of gains = tax + 10%
+penalty), and IRA contribution limits (~$7k/yr) can't absorb $100k of fresh
+capital anyway. IRAs only matter for money already inside one.
+
+### What taxes actually cost — 10-year after-tax multiple per $1
+
+Strategy gains modeled worst-case as 100% short-term, realized annually;
+buy-and-hold defers everything and pays LTCG once at the end:
+
+| Scenario (10 years) | ~24% bracket | ~32% bracket |
+|---|---|---|
+| Trend Trio @ 17.2% CAGR (conservative, full-sample) | 3.4x | 3.0x |
+| Trend Trio @ 22.1% CAGR (2004+ sample) | 4.7x | 4.1x |
+| QQQ buy & hold @ 13%/yr, LTCG 15% | ~3.0x | ~3.0x |
+| SPY buy & hold @ 10%/yr, LTCG 15% | ~2.4x | ~2.4x |
+
+Honest read: after tax, expected wealth is comparable-to-better vs
+buy-and-hold QQQ — the raw edge compresses. The reason to run the system
+anyway is **sequence risk**: with a hard spending date, the worst decade is
+what matters, and QQQ was *negative* over 1999–2009 (−83% at the trough).
+The strategy pays tax drag to buy certainty about the bad outcomes.
+Reality is also slightly better than the table: multi-year trend holds
+(2013, 2016–18, 2023–24 style) become LTCG, and whipsaw losses harvest
+automatically against gains.
+
+### Rules for the taxable account
+
+1. **Dedicated account, strategy capital only.** Mixing discretionary
+   holdings breaks reconciliation and invites tinkering.
+2. **Set tax-lot disposal to specific-ID / highest-cost-first (HIFO)** so
+   partial rebalances realize the smallest possible gains.
+3. **Never skip an exit signal to dodge a tax bill.** The exits are the risk
+   management. A tax-motivated hold through a gate-close is how you end up
+   down 60% with a deadline. Pay the tax, keep the capital.
+4. **Set aside the tax on realized gains each year** (or pay quarterly
+   estimates) — don't let April force liquidations the system didn't order.
+
+### Year-two upgrade: futures for 60/40 treatment
+
+Once the pipeline is trusted, the tax-efficient endgame is replacing the
+leveraged ETFs with micro futures at IBKR — MNQ (Nasdaq-100), ZB/UB
+(Treasuries), MGC (gold). Section 1256 contracts are taxed **60% long-term /
+40% short-term regardless of holding period**, and skip the ~1%/yr ETF
+expense ratios. Costs: quarterly contract rolls, margin mechanics, and
+coarser position granularity (~$2k notional steps per MNQ point of sizing at
+$100k scale). Start with ETFs; revisit after 12 clean months.
+
+### De-risking glide path (spending date ≈ 10 years out)
+
+Sequence risk is highest at the end of the horizon. Around year 8, step the
+portfolio vol target down on a pre-committed schedule — e.g. σ*ₚ 50% → 35%
+(year 8) → 25% (year 9) → unlevered or cash-heavy in the final year. This is
+one constant in the config; decide the schedule now, in writing, so
+late-decade greed can't renegotiate it.
 
 ---
 
@@ -361,7 +407,10 @@ IBKR: `MOC` order type) or next-open market orders.
 - [ ] `state.json` persistence + reconciliation tested (B/C)
 - [ ] Paper traded ≥ 1 month with zero unexplained divergences
 - [ ] `HALT` kill switch tested
-- [ ] Strategy capital in its own account (IRA if possible)
+- [ ] Strategy capital in its own dedicated taxable account
+- [ ] Tax-lot disposal set to specific-ID / HIFO at the broker
+- [ ] Cash reserved (or quarterly estimates planned) for tax on realized gains
+- [ ] De-risking glide path for years 8–10 written down (§7)
 - [ ] Position sizes double-checked against the order-size ceiling
 - [ ] You have pre-committed, in writing, to take every exit signal
 
