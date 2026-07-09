@@ -11,6 +11,7 @@ poetry.toml
 
 # Secrets / runtime state (future live/)
 .env
+!.env.example
 *.log
 
 # IDE
