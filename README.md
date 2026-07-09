@@ -33,7 +33,11 @@ Rules: each sleeve is gated by ensemble momentum votes (63/126/252-day trailing 
 
 Each run recomputes targets from adjusted Alpaca daily closes and reads held weights from broker positions — the ensemble gate is stateless, so there is no state file. Equity orders are notional market DAY orders submitted after the close, which Alpaca queues for the next open (T+1, matching the backtest). Safety rails: stale/absurd-data checks, an unexpected-position reconciliation halt, a 70%-of-equity order ceiling, an open-order duplicate-run guard, and a `HALT` file kill switch at the repo root.
 
-`.github/workflows/daily-trade.yml` runs it at 6 PM Eastern every weekday. GitHub cron is UTC-only, so two crons fire (22:00 and 23:00 UTC) and a guard step proceeds only when it is actually 6 PM in New York — DST-proof. Setup: add `ALPACA_KEY` and `ALPACA_SECRET` (paper keys) as repository secrets. Test locally with:
+`.github/workflows/daily-trade.yml` runs it at 6 PM Eastern every weekday. GitHub cron is UTC-only, so two crons fire (22:00 and 23:00 UTC) and a guard step proceeds only when it is actually 6 PM in New York — DST-proof. Setup: add `ALPACA_KEY` and `ALPACA_SECRET` (paper keys) as repository secrets.
+
+Every run emails a summary (signals table, orders, equity) via Gmail SMTP, and a crash sends a failure alert — silence means the schedule itself is broken. To enable, add `GMAIL_USER` and `GMAIL_APP_PASSWORD` secrets (create an app password at Google Account → Security → 2-Step Verification → App passwords; recipients are configured in `live/trade.py`). Without these secrets the run still trades and just skips the email.
+
+Test locally with:
 
 ```bash
 poetry run python live/trade.py --dry-run

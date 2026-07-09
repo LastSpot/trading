@@ -21,15 +21,19 @@ there is no state file: every run recomputes targets from scratch and trades
 only when a sleeve drifts more than TRADE_BAND from target.
 
 Usage:  python live/trade.py [--dry-run]
-Env:    ALPACA_KEY, ALPACA_SECRET (paper keys; also read from ./.env locally)
+Env:    ALPACA_KEY, ALPACA_SECRET   (paper keys; also read from ./.env locally)
+        GMAIL_USER, GMAIL_APP_PASSWORD  (optional; emails the run summary)
 """
 from __future__ import annotations
 
 import argparse
 import os
+import smtplib
 import sys
+import traceback
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
+from email.message import EmailMessage
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -75,6 +79,8 @@ HISTORY_DAYS = 600           # calendar days fetched (>= 252 bars + vol warm-up)
 MAX_MOVE = 0.25              # reject data with an absurd one-day move
 MAX_ORDER_FRACTION = 0.70    # refuse any single order above 70% of equity
 MIN_NOTIONAL = 1.0           # Alpaca's fractional order minimum
+
+EMAIL_TO = ["anhminhle402@gmail.com", "artificial.voidstorage@gmail.com"]
 
 
 def load_env() -> None:
@@ -228,6 +234,85 @@ def submit_orders(trading: TradingClient, orders: list[dict]) -> None:
         print(f"submitted {o['action']:>4} {sym:<8} {detail}  (id {order.id})")
 
 
+def send_email(subject: str, text: str, html: str | None = None) -> None:
+    """Email the run summary; never fails the run if the email itself fails."""
+    user = os.environ.get("GMAIL_USER")
+    password = os.environ.get("GMAIL_APP_PASSWORD")
+    if not user or not password:
+        print("GMAIL_USER / GMAIL_APP_PASSWORD not set -- skipping email")
+        return
+    msg = EmailMessage()
+    msg["From"] = user
+    msg["To"] = ", ".join(EMAIL_TO)
+    msg["Subject"] = subject
+    msg.set_content(text)
+    if html:
+        msg.add_alternative(html, subtype="html")
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
+            smtp.login(user, password)
+            smtp.send_message(msg)
+        print(f"emailed summary to {', '.join(EMAIL_TO)}")
+    except Exception as exc:  # noqa: BLE001 -- notification must not fail the run
+        print(f"WARNING: email failed: {exc}")
+
+
+def build_rows(targets, diag, held, orders) -> list[dict]:
+    planned = {o["symbol"]: o for o in orders}
+    rows = []
+    for sym in SLEEVES:
+        o = planned.get(sym)
+        action = "hold" if o is None else (
+            "exit" if o["action"] == "exit" else f"{o['action']} ${o['notional']:,.2f}"
+        )
+        rows.append({
+            "sym": sym, "gate": diag[sym]["gate"], "vol": diag[sym]["vol"],
+            "target": targets[sym],
+            "held": held[sym]["weight"] if sym in held else 0.0,
+            "action": action,
+        })
+    return rows
+
+
+def render_text(rows: list[dict], footer: str, status: str) -> str:
+    lines = [f"{'sleeve':<8} {'gate':>5} {'vol':>6} {'target':>7} {'held':>7}  action"]
+    for r in rows:
+        lines.append(
+            f"{r['sym']:<8} {r['gate']:>5.2f} {r['vol']:>6.3f} "
+            f"{r['target']:>7.1%} {r['held']:>7.1%}  {r['action']}"
+        )
+    return "\n".join(lines) + f"\n\n{footer}\n{status}"
+
+
+def render_html(rows: list[dict], footer: str, status: str) -> str:
+    cell = 'style="padding:4px 10px;border-bottom:1px solid #e0e0e0;text-align:right"'
+    left = 'style="padding:4px 10px;border-bottom:1px solid #e0e0e0;text-align:left"'
+    body = ""
+    for r in rows:
+        color = ("#1a7f37" if r["action"].startswith("buy")
+                 else "#c62828" if r["action"] in ("exit",) or r["action"].startswith("sell")
+                 else "#757575")
+        body += (
+            f"<tr><td {left}><b>{r['sym']}</b></td>"
+            f"<td {cell}>{r['gate']:.2f}</td><td {cell}>{r['vol']:.1%}</td>"
+            f"<td {cell}>{r['target']:.1%}</td><td {cell}>{r['held']:.1%}</td>"
+            f"<td {left}><span style='color:{color}'>{r['action']}</span></td></tr>"
+        )
+    head = "".join(
+        f"<th {left if h in ('sleeve', 'action') else cell}>{h}</th>"
+        for h in ("sleeve", "gate", "vol", "target", "held", "action")
+    )
+    return (
+        "<div style='font-family:Segoe UI,Arial,sans-serif;font-size:14px;color:#222'>"
+        f"<p><b>{status}</b></p>"
+        "<table style='border-collapse:collapse'>"
+        f"<tr>{head}</tr>{body}</table>"
+        f"<p style='color:#555'>{footer}</p>"
+        "<p style='color:#999;font-size:12px'>Automated run of live/trade.py "
+        "(six-sleeve trend strategy, variant R50d, Alpaca paper account).</p></div>"
+    )
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -235,7 +320,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    load_env()
     key, secret = os.environ.get("ALPACA_KEY"), os.environ.get("ALPACA_SECRET")
     if not key or not secret:
         sys.exit("ALPACA_KEY / ALPACA_SECRET are not set")
@@ -251,37 +335,49 @@ def main() -> None:
     equity, held = broker_state(trading)
     orders = plan_orders(targets, held, equity)
 
-    planned = {o["symbol"]: o for o in orders}
-    print(f"{'sleeve':<8} {'gate':>5} {'vol':>6} {'target':>7} {'held':>7}  action")
-    for sym in SLEEVES:
-        held_w = held[sym]["weight"] if sym in held else 0.0
-        o = planned.get(sym)
-        action = "-" if o is None else (
-            o["action"] if o["action"] == "exit" else f"{o['action']} ${o['notional']:,.2f}"
-        )
-        print(
-            f"{sym:<8} {diag[sym]['gate']:>5.2f} {diag[sym]['vol']:>6.3f} "
-            f"{targets[sym]:>7.3f} {held_w:>7.3f}  {action}"
-        )
-    print(
-        f"\nequity ${equity:,.2f} | data through {closes.index[-1]} | "
-        f"target invested {sum(targets.values()):.1%}"
-    )
+    if orders and not args.dry_run:
+        open_orders = trading.get_orders(GetOrdersRequest(status=QueryOrderStatus.OPEN))
+        if open_orders:
+            raise RuntimeError(
+                f"{len(open_orders)} open order(s) already queued -- duplicate run? aborting"
+            )
+        submit_orders(trading, orders)
 
     if not orders:
-        print("all sleeves within band -- no trades")
-        return
-    if args.dry_run:
-        print("dry run -- orders not submitted")
-        return
+        status = "No trades -- all sleeves within band."
+        subject_status = "no trades"
+    elif args.dry_run:
+        status = f"DRY RUN -- {len(orders)} order(s) computed but NOT submitted."
+        subject_status = f"dry run: {len(orders)} order(s)"
+    else:
+        status = f"{len(orders)} order(s) submitted, queued for the next market open."
+        subject_status = f"{len(orders)} order(s) queued"
 
-    open_orders = trading.get_orders(GetOrdersRequest(status=QueryOrderStatus.OPEN))
-    if open_orders:
-        raise RuntimeError(
-            f"{len(open_orders)} open order(s) already queued -- duplicate run? aborting"
-        )
-    submit_orders(trading, orders)
+    rows = build_rows(targets, diag, held, orders)
+    footer = (
+        f"equity ${equity:,.2f} &middot; target invested {sum(targets.values()):.1%} "
+        f"&middot; data through {closes.index[-1]}"
+    )
+    footer_text = footer.replace("&middot;", "|")
+    text = render_text(rows, footer_text, status)
+    print(text)
+
+    send_email(
+        subject=f"[trading] {subject_status} | equity ${equity:,.0f} | {closes.index[-1]}",
+        text=text,
+        html=render_html(rows, footer, status),
+    )
 
 
 if __name__ == "__main__":
-    main()
+    load_env()
+    try:
+        main()
+    except Exception:
+        send_email(
+            subject=f"[trading] RUN FAILED | {date.today()}",
+            text="The daily trading run crashed before completing. No orders were "
+                 "verified as placed -- check the GitHub Actions log.\n\n"
+                 + traceback.format_exc(),
+        )
+        raise
