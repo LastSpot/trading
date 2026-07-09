@@ -14,6 +14,9 @@ poetry.toml
 !.env.example
 *.log
 
+# Generated reports
+*.html
+
 # IDE
 .idea/
 .vscode/
