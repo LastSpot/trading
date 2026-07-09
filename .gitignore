@@ -1,0 +1,18 @@
+# Python / Poetry
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Poetry local config (if created)
+poetry.toml
+
+# Secrets / runtime state (future live/)
+.env
+*.log
+
+# IDE
+.idea/
+.vscode/
