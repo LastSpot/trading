@@ -25,6 +25,7 @@ trading/
 │   ├── v2_trend_trio/    # Round 3: Trend Trio (source of truth for live rules)
 │   └── v3_extended/      # Round 4: extended sleeves (EFA, DBC, BTC)
 ├── output/               # Backtest JSON artifacts
+├── tools/                # Utilities (report generator)
 ├── docs/                 # Deployment and infrastructure notes
 ├── setup.sh              # Bootstrap (macOS / Linux)
 ├── setup.cmd             # Bootstrap (Windows — preferred)
@@ -37,6 +38,7 @@ trading/
 | `research/v2_trend_trio/` | `v2_research.py` (Trend Trio backtest), `v2_tune.py` (parameter sensitivity) |
 | `research/v3_extended/` | `v3_research.py` (quint/six-sleeve extensions) |
 | `output/` | `results.json`, `final_results.json`, `v2_results.json`, `v3_results.json`, `canvas_data.json` |
+| `tools/` | `generate_report.py` — interactive Plotly HTML from result JSON |
 | `docs/` | `INFRASTRUCTURE.md` — broker options, signal engine design, scheduling |
 
 ## Setup
@@ -51,5 +53,13 @@ Then run a backtest:
 ```bash
 poetry run python research/v2_trend_trio/v2_research.py
 ```
+
+Generate an interactive HTML report from a result file:
+
+```bash
+poetry run python tools/generate_report.py output/v3_results.json -o report.html
+```
+
+Omit `-o` to write `<input_stem>_report.html` next to the JSON.
 
 Research artifacts only — not investment advice.
