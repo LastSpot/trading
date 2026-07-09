@@ -1,7 +1,8 @@
 # Trend Trio — Live Deployment Infrastructure
 
-Deployment guide for the systematic strategy backtested in this folder
-(`v2_research.py` = the Trend Trio backtest, `final.py` = the TQQQ-only variant).
+Deployment guide for the systematic strategy backtested in this repo
+(`research/v2_trend_trio/v2_research.py` = the Trend Trio backtest,
+`research/v1_tqqq/final.py` = the TQQQ-only variant).
 
 **Strategy recap:** three sleeves — TQQQ (signals on QQQ, 60% risk budget),
 TMF (signals on TLT, 20%), UGL (signals on GLD, 20%) — each gated by its
@@ -140,23 +141,33 @@ capital you don't want to compete with.
 ### 4.1 Project skeleton
 
 ```
-~/Documents/trades/
-├── INFRASTRUCTURE.md        # this file
-├── v2_research.py           # backtest (source of truth for the rules)
-├── live/
+trading/
+├── docs/
+│   └── INFRASTRUCTURE.md    # this file
+├── research/
+│   ├── v1_tqqq/
+│   │   └── final.py         # TQQQ-only variant
+│   └── v2_trend_trio/
+│       └── v2_research.py   # backtest (source of truth for the rules)
+├── output/                  # backtest JSON artifacts
+├── setup.sh / setup.ps1     # Poetry bootstrap
+├── pyproject.toml           # created by setup script on first run
+├── live/                    # (future) daily signal engine
 │   ├── signal_engine.py     # daily job (skeleton in §5)
 │   ├── state.json           # held weights + gate states  (gitignore if public!)
-│   ├── trades.log           # append-only audit trail
-│   └── requirements.txt     # yfinance, pandas, numpy (+ alpaca-py or ib_async)
+│   └── trades.log           # append-only audit trail
 └── .env                     # API keys -- NEVER commit this
 ```
 
 ```bash
-python3 -m venv ~/Documents/trades/live/.venv
-source ~/Documents/trades/live/.venv/bin/activate
-pip install yfinance pandas numpy
-# Option B:  pip install alpaca-py
-# Option C:  pip install ib_async
+# macOS / Linux
+./setup.sh
+
+# Windows (PowerShell)
+.\setup.ps1
+
+# Option B:  poetry add alpaca-py
+# Option C:  poetry add ib_async
 ```
 
 ### 4.2 Notifications (all options)
@@ -197,8 +208,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
-      - run: pip install -r live/requirements.txt
-      - run: python live/signal_engine.py
+      - run: pip install poetry
+      - run: poetry install
+      - run: poetry run python live/signal_engine.py
         env:
           ALPACA_KEY: ${{ secrets.ALPACA_KEY }}
           ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
@@ -416,7 +428,7 @@ late-decade greed can't renegotiate it.
 
 ---
 
-*Backtests in this folder: `final.py` (TQQQ-only RG-VT, 2010–2026),
-`v2_research.py` (Trend Trio with synthetic 3x history, 1999–2026),
-`v2_tune.py` (Kelly/vol-target sensitivity grid). Research artifacts,
+*Backtests in this repo: `research/v1_tqqq/final.py` (TQQQ-only RG-VT, 2010–2026),
+`research/v2_trend_trio/v2_research.py` (Trend Trio with synthetic 3x history, 1999–2026),
+`research/v2_trend_trio/v2_tune.py` (Kelly/vol-target sensitivity grid). Research artifacts,
 not investment advice.*
