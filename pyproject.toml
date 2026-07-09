@@ -10,7 +10,8 @@ dependencies = [
     "numpy",
     "pandas",
     "yfinance",
-    "plotly (>=6.8.0,<7.0.0)"
+    "plotly (>=6.8.0,<7.0.0)",
+    "alpaca-py (>=0.43.5,<0.44.0)"
 ]
 
 [tool.poetry]

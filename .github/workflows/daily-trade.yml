@@ -1,0 +1,54 @@
+# Runs the live paper-trading engine at 6 PM Eastern every weekday.
+#
+# GitHub cron is UTC and does not follow US daylight saving, so two crons are
+# scheduled (22:00 UTC = 6 PM EDT, 23:00 UTC = 6 PM EST) and a guard step lets
+# only the one that lands on 6 PM in New York proceed. Manual dispatch always
+# runs. Set ALPACA_KEY / ALPACA_SECRET as repository secrets.
+name: daily-paper-trade
+
+on:
+  schedule:
+    - cron: "0 22 * * 1-5"
+    - cron: "0 23 * * 1-5"
+  workflow_dispatch: {}
+
+concurrency:
+  group: daily-paper-trade
+  cancel-in-progress: false
+
+jobs:
+  trade:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check it is 6 PM Eastern (skip the off-DST cron)
+        id: guard
+        run: |
+          hour=$(TZ=America/New_York date +%H)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" = "18" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Not 6 PM ET (hour=$hour) -- skipping duplicate DST cron."
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.guard.outputs.run == 'true'
+
+      - uses: actions/setup-python@v5
+        if: steps.guard.outputs.run == 'true'
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        if: steps.guard.outputs.run == 'true'
+        run: |
+          pip install poetry
+          poetry install --no-interaction
+
+      - name: Run trading engine
+        if: steps.guard.outputs.run == 'true'
+        env:
+          ALPACA_KEY: ${{ secrets.ALPACA_KEY }}
+          ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}
+        run: poetry run python live/trade.py
