@@ -8,11 +8,16 @@ C) Multi-sleeve: 3x NDX + 3x TLT + 2x GLD, per-sleeve gate + vol target,
 D) Same rules on SOXL (2010+) as an aggressiveness check.
 """
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/tmp/tqqq_backtest/v2_results.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT_DIR = REPO_ROOT / "output"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+OUT = OUT_DIR / "v2_results.json"
 
 tick = ["QQQ", "SPY", "TLT", "GLD", "TQQQ", "SOXL", "SOXX", "^IRX"]
 raw = yf.download(tick, start="1999-03-10", auto_adjust=True, progress=False)["Close"]

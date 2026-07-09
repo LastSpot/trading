@@ -1,10 +1,15 @@
 """Final strategy: SMA200 hysteresis gate + vol targeting (sigma*=0.50) on TQQQ."""
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/tmp/tqqq_backtest/final_results.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT_DIR = REPO_ROOT / "output"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+OUT = OUT_DIR / "final_results.json"
 
 raw = yf.download(["TQQQ", "QQQ", "SPY", "^IRX"], start="2010-01-01",
                   auto_adjust=True, progress=False)["Close"]

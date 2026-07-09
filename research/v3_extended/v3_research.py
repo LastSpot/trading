@@ -13,11 +13,16 @@ Gates/vols always on underlying (QQQ, TLT, GLD, EFA, DBC, BTC).
 T+1 execution, 5 bps per unit turnover, idle cash at T-bills.
 """
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/Users/michael/Documents/trades/v3_results.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT_DIR = REPO_ROOT / "output"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+OUT = OUT_DIR / "v3_results.json"
 
 tick = ["QQQ", "SPY", "TLT", "GLD", "EFA", "DBC", "TQQQ", "BTC-USD", "^IRX"]
 raw = yf.download(tick, start="1999-03-10", auto_adjust=True, progress=False)["Close"]

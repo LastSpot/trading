@@ -16,11 +16,16 @@ Strategy: "Regime-Filtered Trend, Volatility-Targeted" (RFT-VT)
   - Costs: 5 bps on turnover; idle cash earns 13-week T-bill (^IRX)
 """
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/tmp/tqqq_backtest/results.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT_DIR = REPO_ROOT / "output"
+OUT_DIR.mkdir(parents=True, exist_ok=True)
+OUT = OUT_DIR / "results.json"
 
 # ---------------- data ----------------
 raw = yf.download(["TQQQ", "QQQ", "SPY", "^IRX"], start="2010-01-01",
