@@ -21,11 +21,15 @@ Also tests a mild equity tilt on the best soft brake:
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/Users/michael/Documents/trades/v5_r50dd_sweep.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT = REPO_ROOT / "output" / "v5_r50dd_sweep_results.json"
+OUT.parent.mkdir(parents=True, exist_ok=True)
 
 tick = [
     "QQQ", "SPY", "TLT", "GLD", "DBC", "DBMF", "TQQQ", "TMF", "UGL",

@@ -1,5 +1,5 @@
 """
-Round 5: retail $100k — grow fast with survivable risk.
+v5 retail risk: $100k book — grow fast with survivable risk (Round 5).
 
 Tests the claim that R50d (50% vol, levered ETFs, independent sleeve sizing)
 is too aggressive for limited capital, and that a few dumb risk upgrades
@@ -29,11 +29,15 @@ Execution: T+1, 5bps/turnover, idle cash at T-bills. Same machinery as v3.
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/Users/michael/Documents/trades/v4_results.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT = REPO_ROOT / "output" / "v5_retail_risk_results.json"
+OUT.parent.mkdir(parents=True, exist_ok=True)
 
 tick = [
     "QQQ", "SPY", "TLT", "GLD", "DBC", "DBMF", "TQQQ", "TMF", "UGL",

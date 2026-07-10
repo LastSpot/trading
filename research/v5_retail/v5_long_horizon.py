@@ -23,11 +23,15 @@ Crises: GFC, COVID, 2022, tariff 2025.
 from __future__ import annotations
 
 import json
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-OUT = "/Users/michael/Documents/trades/v5_long_horizon.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]
+OUT = REPO_ROOT / "output" / "v5_long_horizon_results.json"
+OUT.parent.mkdir(parents=True, exist_ok=True)
 
 tick = [
     "QQQ", "SPY", "TLT", "GLD", "DBC", "DBMF", "TQQQ", "TMF", "UGL",
