@@ -1,0 +1,3 @@
+# Per-account kill switches: create an empty file named after the account id
+# (e.g. `paper_r50d`) to skip that account's run. Global kill: repo-root `HALT`.
+.gitkeep

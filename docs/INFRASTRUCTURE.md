@@ -323,8 +323,11 @@ IBKR: `MOC` order type) or next-open market orders.
    few times a year; a Stooq or broker-data fallback is worth adding.
 5. **Order-size ceiling:** refuse any single order > 70% of equity. The
    largest legitimate single move is a full gate-close of the TQQQ sleeve.
-6. **Kill switch:** a `HALT` file in the repo/folder that the script checks
-   first — lets you stop trading from your phone via a one-line commit.
+6. **Kill switch:** a repo-root `HALT` file stops **all** accounts; a file at
+   `live/halts/<account_id>` (e.g. `live/halts/paper_r50d`) stops only that
+   account. Either lets you pause trading from your phone via a one-line
+   commit. Live-money accounts also require `--confirm-live` on the CLI so a
+   paper workflow cannot accidentally submit real orders.
 7. **Audit log:** append every run's signals, targets, and orders to
    `trades.log`. When something looks wrong, the log answers "what did it
    know and when."
@@ -418,7 +421,8 @@ late-decade greed can't renegotiate it.
       runner-outage day (check the missed-run behavior)
 - [ ] `state.json` persistence + reconciliation tested (B/C)
 - [ ] Paper traded ≥ 1 month with zero unexplained divergences
-- [ ] `HALT` kill switch tested
+- [ ] `HALT` (global) and `live/halts/<account_id>` kill switches tested
+- [ ] Live account registered separately from the paper CI matrix; `--confirm-live` required
 - [ ] Strategy capital in its own dedicated taxable account
 - [ ] Tax-lot disposal set to specific-ID / HIFO at the broker
 - [ ] Cash reserved (or quarterly estimates planned) for tax on realized gains
