@@ -3,11 +3,12 @@
 
 Usage:
   poetry run python live/run.py --account paper_r50d
-  poetry run python live/run.py --account paper_r50d --dry-run
+  poetry run python live/run.py --account paper_dm42 --dry-run
   poetry run python live/run.py --account live_r50d --confirm-live
 
 Env (per account; see live/accounts.py and .env.example):
   ALPACA_PAPER_R50D_KEY / ALPACA_PAPER_R50D_SECRET
+  ALPACA_PAPER_DM42_KEY / ALPACA_PAPER_DM42_SECRET
   GMAIL_USER / GMAIL_APP_PASSWORD  (optional)
 """
 from __future__ import annotations

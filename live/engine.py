@@ -318,6 +318,17 @@ def run_account(account: Account, *, dry_run: bool = False, confirm_live: bool =
     closes = fetch_closes(key, secret, last_session, strategy)
     targets, diag = strategy.target_weights(closes)
     equity, held = broker_state(trading, strategy)
+    if hasattr(strategy, "scale_for_risk"):
+        targets, risk_diag = strategy.scale_for_risk(
+            targets, equity, state_key=account.id
+        )
+        diag = {**diag, "_risk": risk_diag}
+        print(
+            f"risk overlay: scale={risk_diag.get('scale', 1.0):.2f} "
+            f"dd={risk_diag.get('dd', 0.0):.1%} "
+            f"braked={risk_diag.get('braked', False)} "
+            f"peak=${risk_diag.get('peak_equity', equity):,.2f}"
+        )
     orders = plan_orders(targets, held, equity, strategy)
 
     if orders and not dry_run:

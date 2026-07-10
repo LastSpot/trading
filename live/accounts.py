@@ -38,6 +38,14 @@ ACCOUNTS: dict[str, Account] = {
         legacy_key_env="ALPACA_KEY",
         legacy_secret_env="ALPACA_SECRET",
     ),
+    "paper_dm42": Account(
+        id="paper_dm42",
+        strategy="dm42",
+        paper=True,
+        key_env="ALPACA_PAPER_DM42_KEY",
+        secret_env="ALPACA_PAPER_DM42_SECRET",
+        email_tag="paper/dm42",
+    ),
     # Promote later:
     # "live_r50d": Account(
     #     id="live_r50d",

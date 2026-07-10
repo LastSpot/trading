@@ -9,10 +9,14 @@ build/
 # Poetry local config (if created)
 poetry.toml
 
-# Secrets / runtime state (future live/)
+# Secrets / runtime state
 .env
 !.env.example
 *.log
+live/state/*
+!live/state/.gitkeep
+live/halts/*
+!live/halts/.gitkeep
 
 # Generated reports
 *.html
