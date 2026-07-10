@@ -68,7 +68,7 @@ Add repository secrets with the same names for CI. Prefer the `ALPACA_PAPER_R50D
 2. Run with `poetry run python live/run.py --account live_r50d --confirm-live` (required for real-money submits; `--dry-run` still works without it).
 3. Use a **separate** GitHub workflow for live — do not add live accounts to the paper matrix.
 
-`.github/workflows/daily-trade.yml` runs the paper matrix at 6 PM Eastern every weekday. GitHub cron is UTC-only, so two crons fire (22:00 and 23:00 UTC) and a guard step proceeds only when it is actually 6 PM in New York — DST-proof. Each matrix account has its own concurrency group.
+`.github/workflows/daily-trade.yml` runs the paper matrix after 6 PM Eastern every weekday. One cron fires at 23:00 UTC (6 PM EST / 7 PM EDT — always at or after 6 PM ET). A guard requires New York hour ≥ 18 so GitHub’s common schedule delay still trades; manual dispatch always runs. Each matrix account has its own concurrency group.
 
 Every run emails a summary (signals table, orders, equity) via Gmail SMTP, and a crash sends a failure alert — silence means the schedule itself is broken. Recipients are configured in `live/engine.py`. Without Gmail secrets the run still trades and just skips the email.
 ## Repository layout

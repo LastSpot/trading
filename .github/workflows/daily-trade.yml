@@ -1,9 +1,11 @@
-# Runs named paper accounts at 6 PM Eastern every weekday.
+# Runs named paper accounts after 6 PM Eastern every weekday.
 #
-# GitHub cron is UTC and does not follow US daylight saving, so two crons are
-# scheduled (22:00 UTC = 6 PM EDT, 23:00 UTC = 6 PM EST) and a guard step lets
-# only the one that lands on 6 PM in New York proceed. Manual dispatch always
-# runs.
+# Goal: trade only after the US cash close, with a 6 PM ET floor (buffer past
+# 4 PM close). GitHub cron is UTC-only and often starts late, so:
+#   - one cron at 23:00 UTC = 6 PM EST (winter) / 7 PM EDT (summer) — always
+#     at or after 6 PM Eastern year-round (no second cron that double-fires)
+#   - guard requires New York hour >= 18 so a delayed runner still trades;
+#     manual workflow_dispatch always runs
 #
 # Add another paper book by appending its id to matrix.account and wiring its
 # ALPACA_PAPER_* secrets. Live money uses a separate workflow with --confirm-live.
@@ -11,7 +13,6 @@ name: daily-paper-trade
 
 on:
   schedule:
-    - cron: "0 22 * * 1-5"
     - cron: "0 23 * * 1-5"
   workflow_dispatch: {}
 
@@ -28,15 +29,18 @@ jobs:
       group: daily-paper-trade-${{ matrix.account }}
       cancel-in-progress: false
     steps:
-      - name: Check it is 6 PM Eastern (skip the off-DST cron)
+      - name: Check it is after 6 PM Eastern
         id: guard
         run: |
           hour=$(TZ=America/New_York date +%H)
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" = "18" ]; then
+          # Strip leading zero so 08 is not octal; hour is 00-23.
+          hour=$((10#$hour))
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$hour" -ge 18 ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Proceeding (event=${{ github.event_name }}, ET hour=$hour)."
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Not 6 PM ET (hour=$hour) -- skipping duplicate DST cron."
+            echo "Before 6 PM ET (hour=$hour) -- skipping."
           fi
 
       - uses: actions/checkout@v4
