@@ -154,9 +154,17 @@ def broker_state(
     trading: TradingClient, strategy: ModuleType
 ) -> tuple[float, dict[str, dict]]:
     """Account equity and held weight/qty per sleeve, from broker positions."""
-    equity = float(trading.get_account().equity)
+    acct = trading.get_account()
+    equity = float(acct.equity)
+    cash = float(acct.cash)
+    if equity <= 0:
+        raise RuntimeError(
+            f"broker equity is ${equity:,.2f} -- cannot size orders; "
+            "reset/liquidate the Alpaca paper account before trading"
+        )
     api_to_sleeve = {sym.replace("/", ""): sym for sym in strategy.SLEEVES}
     held: dict[str, dict] = {}
+    positions_mv = 0.0
     for pos in trading.get_all_positions():
         sym = api_to_sleeve.get(pos.symbol)
         if sym is None:
@@ -164,7 +172,18 @@ def broker_state(
                 f"unexpected position {pos.symbol} in the account -- "
                 "this account must hold strategy sleeves only; reconcile manually"
             )
-        held[sym] = {"weight": float(pos.market_value) / equity, "qty": pos.qty}
+        mv = float(pos.market_value)
+        positions_mv += abs(mv)
+        held[sym] = {"weight": mv / equity, "qty": pos.qty}
+    # Cash deeply negative with large positions (paper double-buy / bad reset)
+    # makes weights >> 1 and trips order rails with a confusing error.
+    if positions_mv > 2.0 * equity:
+        raise RuntimeError(
+            f"broker state incoherent: positions ${positions_mv:,.2f} vs equity "
+            f"${equity:,.2f} (cash ${cash:,.2f}). Likely a paper-account "
+            "double-buy or reset glitch -- liquidate positions and reset the "
+            "Alpaca paper account, then clear live/state/<account>.json"
+        )
     return equity, held
 
 
@@ -185,12 +204,13 @@ def plan_orders(
             notional = round(abs(target_w - held_w) * equity, 2)
             if notional < MIN_NOTIONAL:
                 continue
-            if notional > MAX_ORDER_FRACTION * equity:
+            action = "buy" if target_w > held_w else "sell"
+            # Ceiling is a runaway-buy rail; sells that reduce exposure are fine.
+            if action == "buy" and notional > MAX_ORDER_FRACTION * equity:
                 raise RuntimeError(
-                    f"order for {sym} (${notional:,.2f}) exceeds "
+                    f"buy for {sym} (${notional:,.2f}) exceeds "
                     f"{MAX_ORDER_FRACTION:.0%} of equity -- refusing to trade"
                 )
-            action = "buy" if target_w > held_w else "sell"
             orders.append({"symbol": sym, "action": action, "notional": notional})
     orders.sort(key=lambda o: o["action"] == "buy")
     return orders
