@@ -70,7 +70,7 @@ Add repository secrets with the same names for CI. Prefer the `ALPACA_PAPER_R50D
 
 `.github/workflows/daily-trade.yml` runs the paper matrix after 6 PM Eastern every weekday. One cron fires at 23:00 UTC (6 PM EST / 7 PM EDT — always at or after 6 PM ET). A guard requires New York hour ≥ 18 so GitHub’s common schedule delay still trades; manual dispatch always runs. Each matrix account has its own concurrency group.
 
-Every run emails a summary (signals table, orders, equity) via Gmail SMTP, and a crash sends a failure alert — silence means the schedule itself is broken. Recipients are configured in `live/engine.py`. Without Gmail secrets the run still trades and just skips the email.
+Every run emails a summary (signals table, orders, equity) via Gmail SMTP, and a crash sends a failure alert — silence means the schedule itself is broken. Recipients are configured in `live/engine.py`. Without Gmail secrets the run still trades and just skips the email. Sends try SSL:465 then STARTTLS:587, with up to 3 attempts and backoff, so a single Gmail timeout (common on GitHub Actions) does not drop the summary.
 ## Repository layout
 
 ```

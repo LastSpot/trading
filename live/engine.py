@@ -8,6 +8,7 @@ from __future__ import annotations
 import os
 import smtplib
 import sys
+import time
 import traceback
 from datetime import date, datetime, timedelta, timezone
 from email.message import EmailMessage
@@ -215,8 +216,36 @@ def submit_orders(
         print(f"submitted {o['action']:>4} {sym:<8} {detail}  (id {order.id})")
 
 
+def _smtp_send(msg: EmailMessage, user: str, password: str) -> None:
+    """Try SSL:465 then STARTTLS:587. Gmail from CI is flaky on either alone."""
+    last_exc: Exception | None = None
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=45) as smtp:
+            smtp.login(user, password)
+            smtp.send_message(msg)
+        return
+    except Exception as exc:  # noqa: BLE001 -- fall through to STARTTLS
+        last_exc = exc
+    try:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=45) as smtp:
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+            smtp.login(user, password)
+            smtp.send_message(msg)
+        return
+    except Exception as exc:  # noqa: BLE001 -- surface both failures
+        raise RuntimeError(
+            f"SMTP_SSL(465) failed: {last_exc}; STARTTLS(587) failed: {exc}"
+        ) from exc
+
+
 def send_email(subject: str, text: str, html: str | None = None) -> None:
-    """Email the run summary; never fails the run if the email itself fails."""
+    """Email the run summary; never fails the run if the email itself fails.
+
+    Retries a few times with backoff and alternates SSL/STARTTLS so a single
+    Gmail timeout (common on GitHub Actions) does not drop the daily summary.
+    """
     user = os.environ.get("GMAIL_USER")
     password = os.environ.get("GMAIL_APP_PASSWORD")
     if not user or not password:
@@ -229,13 +258,20 @@ def send_email(subject: str, text: str, html: str | None = None) -> None:
     msg.set_content(text)
     if html:
         msg.add_alternative(html, subtype="html")
-    try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as smtp:
-            smtp.login(user, password)
-            smtp.send_message(msg)
-        print(f"emailed summary to {', '.join(EMAIL_TO)}")
-    except Exception as exc:  # noqa: BLE001 -- notification must not fail the run
-        print(f"WARNING: email failed: {exc}")
+
+    attempts = 3
+    for attempt in range(1, attempts + 1):
+        try:
+            _smtp_send(msg, user, password)
+            print(f"emailed summary to {', '.join(EMAIL_TO)}")
+            return
+        except Exception as exc:  # noqa: BLE001 -- notification must not fail the run
+            if attempt == attempts:
+                print(f"WARNING: email failed after {attempts} attempts: {exc}")
+                return
+            wait = 2 ** attempt  # 2s, 4s
+            print(f"WARNING: email attempt {attempt}/{attempts} failed ({exc}); retry in {wait}s")
+            time.sleep(wait)
 
 
 def build_rows(targets, diag, held, orders, strategy: ModuleType) -> list[dict]:
