@@ -1,29 +1,23 @@
-# Runs weekly paper accounts after the Friday US cash close.
+# Completes cash-rotate weekly rebalances after Monday's open.
 #
-# Goal: rebalance only once per week (Friday), after 6 PM Eastern, matching the
-# DM42 backtest cadence. Cash-rotate books (paper_dm42) submit REDUCE orders only
-# here (sells/exits); buys run Monday via weekly-paper-increase.yml once proceeds
-# free buying power (research: Friday close -> next session).
+# Friday weekly-paper-trade.yml submits sells/exits only. This job submits the
+# matching buys once reduce orders have filled and freed buying power — the
+# live equivalent of the research atomic Friday-close -> next-session rebalance.
 #
-# GitHub cron is UTC-only and often starts late, so:
-#   - one cron at Friday 23:00 UTC = 6 PM EST (winter) / 7 PM EDT (summer) —
-#     always at or after 6 PM Eastern year-round (no second cron that double-fires)
-#   - guard requires Friday after 6 PM ET, or Saturday before noon ET if Actions
-#     queues the Friday job past midnight; manual workflow_dispatch always runs
-#
-# Do not add weekly books to daily-trade.yml — mid-week rebalances diverge from
-# the research. Live money uses a separate workflow with --confirm-live.
-name: weekly-paper-trade
+# Cron 14:35 UTC = 9:35 AM EST / 10:35 AM EDT (always after the 9:30 ET open).
+# Guard requires Monday after 9:30 ET, or Tuesday before noon ET if Actions
+# queues the Monday job past midnight; manual workflow_dispatch always runs.
+name: weekly-paper-increase
 
 on:
   schedule:
-    - cron: "0 23 * * 5"
+    - cron: "35 14 * * 1"
   workflow_dispatch: {}
 
 jobs:
   trade:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
@@ -32,26 +26,27 @@ jobs:
       group: weekly-paper-trade-${{ matrix.account }}
       cancel-in-progress: false
     steps:
-      - name: Check Friday after 6 PM Eastern (or Saturday morning grace)
+      - name: Check Monday after cash open (or Tuesday morning grace)
         id: guard
         run: |
           tz="America/New_York"
           hour=$(TZ=$tz date +%H)
-          # Strip leading zero so 08 is not octal; hour is 00-23.
           hour=$((10#$hour))
-          dow=$(TZ=$tz date +%u)   # 1=Mon ... 5=Fri 6=Sat
+          minute=$(TZ=$tz date +%M)
+          minute=$((10#$minute))
+          dow=$(TZ=$tz date +%u)   # 1=Mon ... 7=Sun
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
             echo "Proceeding (workflow_dispatch)."
-          elif [ "$hour" -ge 18 ] && [ "$dow" -eq 5 ]; then
+          elif [ "$dow" -eq 1 ] && { [ "$hour" -gt 9 ] || { [ "$hour" -eq 9 ] && [ "$minute" -ge 30 ]; }; }; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Proceeding (Friday after 6 PM ET; hour=$hour)."
-          elif [ "$dow" -eq 6 ] && [ "$hour" -lt 12 ]; then
+            echo "Proceeding (Monday after 9:30 ET; hour=$hour minute=$minute)."
+          elif [ "$dow" -eq 2 ] && [ "$hour" -lt 12 ]; then
             echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "Proceeding (late Friday cron slipped into Saturday morning ET; hour=$hour)."
+            echo "Proceeding (late Monday cron slipped into Tuesday morning ET; hour=$hour)."
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "Skipping (event=${{ github.event_name }}, ET dow=$dow hour=$hour)."
+            echo "Skipping (event=${{ github.event_name }}, ET dow=$dow hour=$hour minute=$minute)."
           fi
 
       - uses: actions/checkout@v4
@@ -68,8 +63,6 @@ jobs:
           pip install poetry
           poetry install --no-interaction
 
-      # DD-brake peak equity lives in live/state/<account>.json (gitignored).
-      # Restore/save across runs so the brake is not reset every Friday.
       - name: Restore strategy state
         if: steps.guard.outputs.run == 'true'
         uses: actions/cache/restore@v4
@@ -79,14 +72,14 @@ jobs:
           restore-keys: |
             live-state-${{ matrix.account }}-
 
-      - name: Run trading engine
+      - name: Run increase phase
         if: steps.guard.outputs.run == 'true'
         env:
           ALPACA_PAPER_DM42_KEY: ${{ secrets.ALPACA_PAPER_DM42_KEY }}
           ALPACA_PAPER_DM42_SECRET: ${{ secrets.ALPACA_PAPER_DM42_SECRET }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: poetry run python live/run.py --account ${{ matrix.account }} --phase reduce
+        run: poetry run python live/run.py --account ${{ matrix.account }} --phase increase
 
       - name: Save strategy state
         if: steps.guard.outputs.run == 'true' && always()

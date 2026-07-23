@@ -1,10 +1,12 @@
 """Shared Alpaca trading runtime used by all named accounts.
 
 Strategy logic lives in live/strategies/; account identity in live/accounts.py.
-This module owns broker I/O, safety rails, email, and the daily run loop.
+This module owns broker I/O, safety rails, email, and the run loop (including
+cash-rotate reduce/increase phases for weekly rotators like DM42).
 """
 from __future__ import annotations
 
+import json
 import os
 import smtplib
 import sys
@@ -35,11 +37,18 @@ from strategies import get_strategy
 REPO_ROOT = Path(__file__).resolve().parents[1]
 LIVE_DIR = Path(__file__).resolve().parent
 HALTS_DIR = LIVE_DIR / "halts"
+STATE_DIR = LIVE_DIR / "state"
 ET = ZoneInfo("America/New_York")
 
 MAX_ORDER_FRACTION = 0.70
 MIN_NOTIONAL = 1.0
 EMAIL_TO = ["anhminhle402@gmail.com", "artificial.voidstorage@gmail.com"]
+
+# cash_rotate phases: reduce after signal close; increase next session after cash frees.
+PHASES = frozenset({"auto", "reduce", "increase"})
+BUY_POWER_BUFFER = 0.99  # leave a haircut so Alpaca BP rounding does not 403
+FILL_WAIT_SEC = 600
+FILL_POLL_SEC = 15
 
 
 def load_env() -> None:
@@ -216,6 +225,97 @@ def plan_orders(
     return orders
 
 
+def split_orders(orders: list[dict]) -> tuple[list[dict], list[dict]]:
+    """Partition into reduces (exit/sell) then increases (buy)."""
+    reduces = [o for o in orders if o["action"] != "buy"]
+    buys = [o for o in orders if o["action"] == "buy"]
+    return reduces, buys
+
+
+def rebalance_path(account_id: str) -> Path:
+    return STATE_DIR / f"{account_id}.rebalance.json"
+
+
+def load_pending_rebalance(account_id: str) -> dict | None:
+    path = rebalance_path(account_id)
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def save_pending_rebalance(account_id: str, payload: dict) -> None:
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    path = rebalance_path(account_id)
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+
+def clear_pending_rebalance(account_id: str) -> None:
+    path = rebalance_path(account_id)
+    if path.exists():
+        path.unlink()
+
+
+def open_orders(trading: TradingClient) -> list:
+    return list(trading.get_orders(GetOrdersRequest(status=QueryOrderStatus.OPEN)))
+
+
+def market_is_open(trading: TradingClient) -> bool:
+    return bool(trading.get_clock().is_open)
+
+
+def wait_for_no_open_orders(
+    trading: TradingClient, *, timeout_sec: float = FILL_WAIT_SEC
+) -> bool:
+    """Poll until no open orders. Return True if clear, False on timeout."""
+    deadline = time.time() + timeout_sec
+    while True:
+        open_list = open_orders(trading)
+        if not open_list:
+            return True
+        if time.time() >= deadline:
+            syms = ", ".join(sorted({o.symbol for o in open_list}))
+            print(
+                f"WARNING: still {len(open_list)} open order(s) after "
+                f"{timeout_sec:.0f}s ({syms})"
+            )
+            return False
+        print(f"waiting for {len(open_list)} open order(s) to fill...")
+        time.sleep(FILL_POLL_SEC)
+
+
+def clip_buys_to_buying_power(
+    trading: TradingClient, buys: list[dict]
+) -> list[dict]:
+    """Scale buy notionals down if broker buying power is short (paper rounding)."""
+    if not buys:
+        return buys
+    bp = float(trading.get_account().buying_power) * BUY_POWER_BUFFER
+    need = sum(float(o["notional"]) for o in buys)
+    if need <= bp or need <= 0:
+        return buys
+    if bp < MIN_NOTIONAL:
+        raise RuntimeError(
+            f"insufficient buying power ${bp:,.2f} for ${need:,.2f} of buys -- "
+            "reduces may not have filled yet"
+        )
+    scale = bp / need
+    print(
+        f"NOTE: scaling buys by {scale:.3f} to fit buying power "
+        f"${bp:,.2f} (planned ${need:,.2f})"
+    )
+    out = []
+    for o in buys:
+        notional = round(float(o["notional"]) * scale, 2)
+        if notional < MIN_NOTIONAL:
+            continue
+        out.append({**o, "notional": notional})
+    return out
+
+
 def submit_orders(
     trading: TradingClient, orders: list[dict], strategy: ModuleType
 ) -> None:
@@ -234,6 +334,29 @@ def submit_orders(
         order = trading.submit_order(request)
         detail = f"qty {o['qty']}" if o["action"] == "exit" else f"${o['notional']:,.2f}"
         print(f"submitted {o['action']:>4} {sym:<8} {detail}  (id {order.id})")
+
+
+def _ensure_no_surprise_open_orders(
+    trading: TradingClient, *, allow_symbols: set[str] | None = None
+) -> None:
+    """Abort on unexpected open orders; allow listed sleeve symbols (in-flight reduces)."""
+    open_list = open_orders(trading)
+    if not open_list:
+        return
+    allow_symbols = allow_symbols or set()
+    # Alpaca crypto symbols may omit the slash.
+    allow_api = {s.replace("/", "") for s in allow_symbols} | set(allow_symbols)
+    unexpected = [o for o in open_list if o.symbol not in allow_api]
+    if unexpected:
+        raise RuntimeError(
+            f"{len(unexpected)} unexpected open order(s) already queued -- "
+            "duplicate run? aborting"
+        )
+    print(
+        f"NOTE: {len(open_list)} open order(s) on "
+        f"{', '.join(sorted({o.symbol for o in open_list}))} "
+        "(treating as in-flight reduces)"
+    )
 
 
 def _smtp_send(msg: EmailMessage, user: str, password: str) -> None:
@@ -353,28 +476,27 @@ def render_html(
     )
 
 
-def run_account(account: Account, *, dry_run: bool = False, confirm_live: bool = False) -> None:
-    """Execute one daily cycle for a named account."""
-    if not account.paper and not dry_run and not confirm_live:
-        sys.exit(
-            f"account {account.id} is LIVE money -- pass --confirm-live to submit orders "
-            "(or --dry-run to compute without trading)"
-        )
+def _resolve_phase(account: Account, phase: str) -> str:
+    if phase not in PHASES:
+        raise ValueError(f"unknown phase {phase!r}; expected one of {sorted(PHASES)}")
+    if not account.cash_rotate:
+        return "all"
+    if phase == "auto":
+        pending = load_pending_rebalance(account.id)
+        return "increase" if pending else "reduce"
+    return phase
 
-    strategy = get_strategy(account.strategy)
-    key, secret = resolve_credentials(account)
 
-    halted = check_halts(account)
-    if halted is not None:
-        print(f"HALT present at {halted} -- skipping run for {account.id}")
-        return
-
-    trading = TradingClient(key, secret, paper=account.paper)
-    last_session = last_completed_session(trading)
-    closes = fetch_closes(key, secret, last_session, strategy)
+def _compute_targets(
+    strategy: ModuleType,
+    closes: pd.DataFrame,
+    equity: float,
+    account: Account,
+    *,
+    apply_risk: bool,
+) -> tuple[dict[str, float], dict]:
     targets, diag = strategy.target_weights(closes)
-    equity, held = broker_state(trading, strategy)
-    if hasattr(strategy, "scale_for_risk"):
+    if apply_risk and hasattr(strategy, "scale_for_risk"):
         targets, risk_diag = strategy.scale_for_risk(
             targets, equity, state_key=account.id
         )
@@ -385,32 +507,256 @@ def run_account(account: Account, *, dry_run: bool = False, confirm_live: bool =
             f"braked={risk_diag.get('braked', False)} "
             f"peak=${risk_diag.get('peak_equity', equity):,.2f}"
         )
+    return targets, diag
+
+
+def run_account(
+    account: Account,
+    *,
+    dry_run: bool = False,
+    confirm_live: bool = False,
+    phase: str = "auto",
+) -> None:
+    """Execute one cycle for a named account.
+
+    cash_rotate accounts split rebalance into reduce (sells/exits after signal
+    close) and increase (buys next session once cash is free), matching the
+    research Friday-close -> next-session T+1 path.
+    """
+    if not account.paper and not dry_run and not confirm_live:
+        sys.exit(
+            f"account {account.id} is LIVE money -- pass --confirm-live to submit orders "
+            "(or --dry-run to compute without trading)"
+        )
+
+    strategy = get_strategy(account.strategy)
+    key, secret = resolve_credentials(account)
+    resolved = _resolve_phase(account, phase)
+
+    halted = check_halts(account)
+    if halted is not None:
+        print(f"HALT present at {halted} -- skipping run for {account.id}")
+        return
+
+    trading = TradingClient(key, secret, paper=account.paper)
+    last_session = last_completed_session(trading)
+    closes = fetch_closes(key, secret, last_session, strategy)
+    equity, held = broker_state(trading, strategy)
+    pending = load_pending_rebalance(account.id)
+
+    if resolved == "increase" and pending and isinstance(pending.get("targets"), dict):
+        # Freeze Friday targets (weekly_hold); do not re-signal or re-brake.
+        targets = {sym: float(pending["targets"].get(sym, 0.0)) for sym in strategy.SLEEVES}
+        _, diag = strategy.target_weights(closes)  # email diagnostics only
+        print(
+            f"phase=increase using frozen targets from signal_date="
+            f"{pending.get('signal_date', '?')}"
+        )
+    else:
+        targets, diag = _compute_targets(
+            strategy, closes, equity, account, apply_risk=True
+        )
+
     orders = plan_orders(targets, held, equity, strategy)
+    reduces, buys = split_orders(orders)
 
-    if orders and not dry_run:
-        open_orders = trading.get_orders(GetOrdersRequest(status=QueryOrderStatus.OPEN))
-        if open_orders:
+    if resolved == "all":
+        to_submit = orders
+    elif resolved == "reduce":
+        if pending and not dry_run:
             raise RuntimeError(
-                f"{len(open_orders)} open order(s) already queued -- duplicate run? aborting"
+                f"pending rebalance from {pending.get('signal_date')} still awaits "
+                f"increase -- run with --phase increase before a new reduce"
             )
-        submit_orders(trading, orders, strategy)
+        to_submit = reduces + buys  # dry-run shows full plan; submit path splits
+    else:  # increase
+        to_submit = reduces + buys  # may still need leftover reduces (crash recovery)
 
-    if not orders:
+    submitted: list[dict] = []
+    deferred = False
+
+    if not dry_run and (to_submit or (resolved == "increase" and pending)):
+        if resolved == "all":
+            if not to_submit:
+                pass
+            elif open_orders(trading):
+                raise RuntimeError(
+                    f"{len(open_orders(trading))} open order(s) already queued -- "
+                    "duplicate run? aborting"
+                )
+            else:
+                submit_orders(trading, to_submit, strategy)
+                submitted = list(to_submit)
+
+        elif resolved == "reduce":
+            if open_orders(trading):
+                raise RuntimeError(
+                    f"{len(open_orders(trading))} open order(s) already queued -- "
+                    "duplicate run? aborting"
+                )
+            if reduces and buys:
+                # Persist before reduce submit so a mid-crash can finish on increase.
+                save_pending_rebalance(
+                    account.id,
+                    {
+                        "signal_date": str(closes.index[-1]),
+                        "targets": targets,
+                        "status": "awaiting_increase",
+                        "reduces": [
+                            {"symbol": o["symbol"], "action": o["action"]}
+                            for o in reduces
+                        ],
+                        "buy_symbols": [o["symbol"] for o in buys],
+                    },
+                )
+                submit_orders(trading, reduces, strategy)
+                submitted = list(reduces)
+            elif reduces:
+                submit_orders(trading, reduces, strategy)
+                submitted = list(reduces)
+            elif buys:
+                # Already have cash; no sell leg -- queue buys same session.
+                submit_orders(trading, buys, strategy)
+                submitted = list(buys)
+
+        else:  # increase
+            allow = {o["symbol"] for o in reduces}
+            if pending:
+                allow |= {
+                    r["symbol"]
+                    for r in pending.get("reduces", [])
+                    if isinstance(r, dict) and "symbol" in r
+                }
+            _ensure_no_surprise_open_orders(trading, allow_symbols=allow)
+
+            opened = open_orders(trading)
+            open_syms = {o.symbol for o in opened} | {
+                o.symbol.replace("/", "") for o in opened
+            }
+            need_reduce = [
+                o for o in reduces
+                if o["symbol"] not in open_syms
+                and o["symbol"].replace("/", "") not in open_syms
+            ]
+            if need_reduce:
+                print(
+                    f"phase=increase: submitting {len(need_reduce)} missing reduce(s) "
+                    "before buys"
+                )
+                submit_orders(trading, need_reduce, strategy)
+                submitted.extend(need_reduce)
+
+            if open_orders(trading):
+                if market_is_open(trading):
+                    if not wait_for_no_open_orders(trading):
+                        raise RuntimeError(
+                            "open reduce orders did not fill in time -- "
+                            "rerun --phase increase after fills"
+                        )
+                else:
+                    deferred = True
+                    if pending is None:
+                        # Crash recovery with no pending file: freeze targets now.
+                        save_pending_rebalance(
+                            account.id,
+                            {
+                                "signal_date": str(closes.index[-1]),
+                                "targets": targets,
+                                "status": "awaiting_increase",
+                                "reduces": [
+                                    {"symbol": o["symbol"], "action": o["action"]}
+                                    for o in reduces
+                                ],
+                                "buy_symbols": [o["symbol"] for o in buys],
+                            },
+                        )
+                    print(
+                        "market closed with open reduce order(s) -- "
+                        "keeping pending rebalance; buys deferred to next session"
+                    )
+
+            if not deferred:
+                equity, held = broker_state(trading, strategy)
+                _, replanned_buys = split_orders(
+                    plan_orders(targets, held, equity, strategy)
+                )
+                still_buy = clip_buys_to_buying_power(trading, replanned_buys)
+                if still_buy:
+                    if open_orders(trading):
+                        raise RuntimeError(
+                            "open orders remain before buy submit -- aborting"
+                        )
+                    submit_orders(trading, still_buy, strategy)
+                    submitted.extend(still_buy)
+                clear_pending_rebalance(account.id)
+                equity, held = broker_state(trading, strategy)
+                orders = plan_orders(targets, held, equity, strategy)
+
+    # Display / email: show the full planned set for context, highlight phase.
+    display_orders = orders
+    if resolved == "reduce":
+        display_orders = reduces + buys
+    elif resolved == "increase":
+        display_orders = submitted if submitted else (reduces + buys)
+
+    if deferred:
+        status = (
+            f"phase=increase deferred -- reduce order(s) still open until next "
+            "session; pending rebalance kept."
+        )
+        subject_status = "increase deferred"
+    elif dry_run:
+        n = len(orders) if resolved == "all" else len(reduces) + len(buys)
+        status = (
+            f"DRY RUN phase={resolved} -- {n} order(s) computed but NOT submitted."
+        )
+        subject_status = f"dry run {resolved}: {n} order(s)"
+    elif resolved == "reduce":
+        if not reduces and not buys:
+            status = "No trades -- all sleeves within band."
+            subject_status = "no trades"
+        elif submitted and buys and reduces:
+            status = (
+                f"phase=reduce: {len(submitted)} reduce order(s) submitted "
+                f"(queued next open); {len(buys)} buy(s) pending for increase phase."
+            )
+            subject_status = (
+                f"reduce: {len(submitted)} queued, {len(buys)} buy(s) pending"
+            )
+        elif submitted:
+            status = (
+                f"phase=reduce: {len(submitted)} order(s) submitted "
+                "(queued for the next market open)."
+            )
+            subject_status = f"reduce: {len(submitted)} order(s)"
+        else:
+            status = "phase=reduce: nothing to submit."
+            subject_status = "reduce: idle"
+    elif resolved == "increase":
+        if submitted:
+            status = (
+                f"phase=increase: {len(submitted)} order(s) submitted "
+                "(queued / working)."
+            )
+            subject_status = f"increase: {len(submitted)} order(s)"
+        else:
+            status = "phase=increase -- book already at targets (no buys needed)."
+            subject_status = "increase: flat"
+            clear_pending_rebalance(account.id)
+    elif not orders:
         status = "No trades -- all sleeves within band."
         subject_status = "no trades"
-    elif dry_run:
-        status = f"DRY RUN -- {len(orders)} order(s) computed but NOT submitted."
-        subject_status = f"dry run: {len(orders)} order(s)"
     else:
-        status = f"{len(orders)} order(s) submitted, queued for the next market open."
-        subject_status = f"{len(orders)} order(s) queued"
+        status = f"{len(submitted)} order(s) submitted, queued for the next market open."
+        subject_status = f"{len(submitted)} order(s) queued"
 
-    rows = build_rows(targets, diag, held, orders, strategy)
+    rows = build_rows(targets, diag, held, display_orders, strategy)
     mode = "paper" if account.paper else "LIVE"
     footer = (
         f"{account.email_tag} ({mode}) &middot; equity ${equity:,.2f} "
         f"&middot; target invested {sum(targets.values()):.1%} "
         f"&middot; data through {closes.index[-1]}"
+        f" &middot; phase {resolved}"
     )
     footer_text = footer.replace("&middot;", "|")
     text = render_text(rows, footer_text, status)

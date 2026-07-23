@@ -3,6 +3,10 @@
 Research pick DM_L42_k4_s45_dd20_50 from research/v6_turnover:
   42d absolute + relative momentum, top-4 equal weight, sigma*=45%,
   peak-DD brake at -20% -> 50% scale until new equity high.
+
+Live execution (cash_rotate): Friday --phase reduce submits sells/exits;
+Monday --phase increase submits buys after proceeds free buying power
+(Friday close -> next session, matching the backtest).
 """
 from __future__ import annotations
 

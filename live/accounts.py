@@ -20,6 +20,9 @@ class Account:
     # Optional legacy env names accepted as fallback (soft cutover for paper_r50d).
     legacy_key_env: str | None = None
     legacy_secret_env: str | None = None
+    # Cash-account rotators (e.g. DM42): sell/exit after Friday close, buy next session
+    # once proceeds free buying power. Matches research T+1 atomic rebalance.
+    cash_rotate: bool = False
 
     @property
     def halt_path_name(self) -> str:
@@ -45,6 +48,7 @@ ACCOUNTS: dict[str, Account] = {
         key_env="ALPACA_PAPER_DM42_KEY",
         secret_env="ALPACA_PAPER_DM42_SECRET",
         email_tag="paper/dm42",
+        cash_rotate=True,
     ),
     # Promote later:
     # "live_r50d": Account(

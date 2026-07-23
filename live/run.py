@@ -4,6 +4,8 @@
 Usage:
   poetry run python live/run.py --account paper_r50d
   poetry run python live/run.py --account paper_dm42 --dry-run
+  poetry run python live/run.py --account paper_dm42 --phase reduce
+  poetry run python live/run.py --account paper_dm42 --phase increase
   poetry run python live/run.py --account live_r50d --confirm-live
 
 Env (per account; see live/accounts.py and .env.example):
@@ -21,7 +23,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from accounts import get_account, list_accounts  # noqa: E402
-from engine import load_env, notify_run_failure, run_account  # noqa: E402
+from engine import PHASES, load_env, notify_run_failure, run_account  # noqa: E402
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -42,11 +44,26 @@ def main(argv: list[str] | None = None) -> None:
         action="store_true",
         help="required to submit orders on paper=False (real-money) accounts",
     )
+    parser.add_argument(
+        "--phase",
+        default="auto",
+        choices=sorted(PHASES),
+        help=(
+            "cash-rotate accounts only: reduce=sells/exits after signal close; "
+            "increase=buys after reduces free cash; auto=increase if a pending "
+            "rebalance exists else reduce (ignored for non-rotate accounts)"
+        ),
+    )
     args = parser.parse_args(argv)
 
     account = get_account(args.account)
     try:
-        run_account(account, dry_run=args.dry_run, confirm_live=args.confirm_live)
+        run_account(
+            account,
+            dry_run=args.dry_run,
+            confirm_live=args.confirm_live,
+            phase=args.phase,
+        )
     except Exception:
         notify_run_failure(account.id)
         raise
