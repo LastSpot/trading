@@ -1,0 +1,1762 @@
+{
+  "meta": {
+    "strategy": "V10 orthogonal premia (VRP + MR)",
+    "primary": "R50d_plus",
+    "baseline": "R50d",
+    "data_start": "1999-03-10",
+    "data_end": "2026-07-29",
+    "full_common_start": "2012-07-02",
+    "design": "research/v10_orthogonal/DESIGN.md",
+    "inception": {
+      "SVXY": "2011-10-04",
+      "VIX3M": "2006-07-17"
+    },
+    "params": {
+      "B_V": 0.15,
+      "vrp_enter": 1.05,
+      "vrp_exit": 1.0,
+      "B_M": 0.2,
+      "mr_entry": 10.0,
+      "mr_exit": 60.0,
+      "mr_max_hold": 10,
+      "cost_core_bps": 5.0,
+      "cost_new_bps": 10.0
+    }
+  },
+  "windows": {
+    "full_common": {
+      "R50d": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.21658950199581262,
+        "annualized_vol": 0.18150441620480318,
+        "sharpe": 1.081135177156696,
+        "calmar": 0.9451057714243261,
+        "total_return": 14.783174770516693,
+        "terminal_100k": 1578317.4770516693,
+        "worst_month": -0.124764340082122,
+        "annual_turnover": 13.455046556860047,
+        "drawdown": {
+          "max_dd": -0.22916958984326208,
+          "peak_date": "2015-04-24",
+          "trough_date": "2016-01-28",
+          "recovery_date": "2017-01-24",
+          "peak_to_trough_trading_days": 192,
+          "trough_to_recovery_trading_days": 249,
+          "time_underwater_pct": 0.8812888637648388
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.04016538725180974,
+        "annualized_vol": 0.055450561815310107,
+        "sharpe": 0.4350268385867374,
+        "calmar": 0.5471959279053982,
+        "total_return": 0.7405015052537389,
+        "terminal_100k": 174050.1505253739,
+        "worst_month": -0.044063114721934915,
+        "annual_turnover": 1.7340022648891653,
+        "drawdown": {
+          "max_dd": -0.07340220422611354,
+          "peak_date": "2024-07-12",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-12-22",
+          "peak_to_trough_trading_days": 178,
+          "trough_to_recovery_trading_days": 185,
+          "time_underwater_pct": 0.8971170152628604
+        }
+      },
+      "MR_sleeve": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.023864877546303065,
+        "annualized_vol": 0.01560781621874085,
+        "sharpe": 0.44001214879039835,
+        "calmar": 1.0369657246849542,
+        "total_return": 0.39360651951259196,
+        "terminal_100k": 139360.6519512592,
+        "worst_month": -0.013355482587535605,
+        "annual_turnover": 3.481955252918288,
+        "drawdown": {
+          "max_dd": -0.023014143069727377,
+          "peak_date": "2020-09-09",
+          "trough_date": "2021-02-25",
+          "recovery_date": "2021-11-12",
+          "peak_to_trough_trading_days": 116,
+          "trough_to_recovery_trading_days": 182,
+          "time_underwater_pct": 0.6746749576031656
+        }
+      },
+      "R50d_plus": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.20888995930500331,
+        "annualized_vol": 0.18799998067510687,
+        "sharpe": 1.0164131790308195,
+        "calmar": 0.941882233855353,
+        "total_return": 13.43418268892173,
+        "terminal_100k": 1443418.268892173,
+        "worst_month": -0.1294398349016368,
+        "annual_turnover": 15.933465012788961,
+        "drawdown": {
+          "max_dd": -0.2217792753664818,
+          "peak_date": "2015-04-24",
+          "trough_date": "2016-01-27",
+          "recovery_date": "2016-08-12",
+          "peak_to_trough_trading_days": 191,
+          "trough_to_recovery_trading_days": 138,
+          "time_underwater_pct": 0.8716789146410401
+        }
+      },
+      "VRP_nogate": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.04623314905610432,
+        "annualized_vol": 0.06308189242435368,
+        "sharpe": 0.48207326215952623,
+        "calmar": 0.3864238000895498,
+        "total_return": 0.8889600466425789,
+        "terminal_100k": 188896.0046642579,
+        "worst_month": -0.08484502511101588,
+        "annual_turnover": 0.12533744428959392,
+        "drawdown": {
+          "max_dd": -0.11964363749176488,
+          "peak_date": "2020-01-16",
+          "trough_date": "2020-03-18",
+          "recovery_date": "2021-06-24",
+          "peak_to_trough_trading_days": 42,
+          "trough_to_recovery_trading_days": 320,
+          "time_underwater_pct": 0.8812888637648388
+        }
+      },
+      "MR_notrend": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.026422503410137965,
+        "annualized_vol": 0.023077174094534164,
+        "sharpe": 0.41222603351690446,
+        "calmar": 0.6010946217028373,
+        "total_return": 0.44340450921799346,
+        "terminal_100k": 144340.45092179935,
+        "worst_month": -0.013355482587535605,
+        "annual_turnover": 4.419951361867704,
+        "drawdown": {
+          "max_dd": -0.043957311305308,
+          "peak_date": "2020-03-10",
+          "trough_date": "2021-02-25",
+          "recovery_date": "2022-12-28",
+          "peak_to_trough_trading_days": 243,
+          "trough_to_recovery_trading_days": 464,
+          "time_underwater_pct": 0.6848501978518937
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.0567148661251633,
+        "annualized_vol": 0.08057844223394693,
+        "sharpe": 0.5171126574145118,
+        "calmar": 0.49734701936231485,
+        "total_return": 1.17343999124502,
+        "terminal_100k": 217343.999124502,
+        "worst_month": -0.06788441282968971,
+        "annual_turnover": 1.7340022648891653,
+        "drawdown": {
+          "max_dd": -0.1140347964644115,
+          "peak_date": "2015-06-23",
+          "trough_date": "2016-02-09",
+          "recovery_date": "2016-06-01",
+          "peak_to_trough_trading_days": 159,
+          "trough_to_recovery_trading_days": 78,
+          "time_underwater_pct": 0.9055963821368005
+        }
+      },
+      "bench_SPY": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.14632745921457335,
+        "annualized_vol": 0.16666687145239942,
+        "sharpe": 0.8036735447441009,
+        "calmar": 0.43398390845038953,
+        "total_return": 5.8332099671667645,
+        "terminal_100k": 683320.9967166764,
+        "worst_month": -0.12487138221696192,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.3371725457219358,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-23",
+          "recovery_date": "2020-08-10",
+          "peak_to_trough_trading_days": 23,
+          "trough_to_recovery_trading_days": 97,
+          "time_underwater_pct": 0.8377614471452798
+        }
+      },
+      "bench_QQQ": {
+        "start": "2012-07-02",
+        "end": "2026-07-29",
+        "cagr": 0.1904785040957908,
+        "annualized_vol": 0.20678546877256299,
+        "sharpe": 0.8672890677068945,
+        "calmar": 0.5423844940143925,
+        "total_return": 10.630426502388893,
+        "terminal_100k": 1163042.6502388893,
+        "worst_month": -0.1359573718408258,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.3511872227135172,
+          "peak_date": "2021-12-27",
+          "trough_date": "2022-11-03",
+          "recovery_date": "2023-12-13",
+          "peak_to_trough_trading_days": 216,
+          "trough_to_recovery_trading_days": 278,
+          "time_underwater_pct": 0.8470887507066139
+        }
+      }
+    },
+    "from_2015": {
+      "R50d": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.21055715862068647,
+        "annualized_vol": 0.18407395191818499,
+        "sharpe": 1.0221940066856472,
+        "calmar": 0.9187831542775541,
+        "total_return": 8.123321680786074,
+        "terminal_100k": 912332.1680786073,
+        "worst_month": -0.124764340082122,
+        "annual_turnover": 12.23162508524008,
+        "drawdown": {
+          "max_dd": -0.22916958984326297,
+          "peak_date": "2015-04-24",
+          "trough_date": "2016-01-28",
+          "recovery_date": "2017-01-24",
+          "peak_to_trough_trading_days": 192,
+          "trough_to_recovery_trading_days": 249,
+          "time_underwater_pct": 0.8913716053626676
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.04141373908033863,
+        "annualized_vol": 0.05672070543303459,
+        "sharpe": 0.38505764935516257,
+        "calmar": 0.5642029352792205,
+        "total_return": 0.5992059205986435,
+        "terminal_100k": 159920.59205986434,
+        "worst_month": -0.044063114721934915,
+        "annual_turnover": 1.6795765620678462,
+        "drawdown": {
+          "max_dd": -0.07340220422611454,
+          "peak_date": "2024-07-12",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-12-22",
+          "peak_to_trough_trading_days": 178,
+          "trough_to_recovery_trading_days": 185,
+          "time_underwater_pct": 0.8927466483327604
+        }
+      },
+      "MR_sleeve": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.02664853996469496,
+        "annualized_vol": 0.016461411078960347,
+        "sharpe": 0.36737720766680215,
+        "calmar": 1.1579201486649138,
+        "total_return": 0.35566365562184155,
+        "terminal_100k": 135566.36556218416,
+        "worst_month": -0.013355482587535605,
+        "annual_turnover": 3.4398840511121622,
+        "drawdown": {
+          "max_dd": -0.023014143069727933,
+          "peak_date": "2020-09-09",
+          "trough_date": "2021-02-25",
+          "recovery_date": "2021-11-12",
+          "peak_to_trough_trading_days": 116,
+          "trough_to_recovery_trading_days": 182,
+          "time_underwater_pct": 0.6146442076314885
+        }
+      },
+      "R50d_plus": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.1994039860852186,
+        "annualized_vol": 0.19119056929749922,
+        "sharpe": 0.9427143449678574,
+        "calmar": 0.8991100983431035,
+        "total_return": 7.196777105207763,
+        "terminal_100k": 819677.7105207763,
+        "worst_month": -0.1294398349016368,
+        "annual_turnover": 14.88076358758743,
+        "drawdown": {
+          "max_dd": -0.22177927536648057,
+          "peak_date": "2015-04-24",
+          "trough_date": "2016-01-27",
+          "recovery_date": "2016-08-12",
+          "peak_to_trough_trading_days": 191,
+          "trough_to_recovery_trading_days": 138,
+          "time_underwater_pct": 0.8817463045720179
+        }
+      },
+      "VRP_nogate": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.04400781430515255,
+        "annualized_vol": 0.06388422880403899,
+        "sharpe": 0.3877610688522823,
+        "calmar": 0.36782410855889786,
+        "total_return": 0.6459071211808363,
+        "terminal_100k": 164590.71211808364,
+        "worst_month": -0.08484502511101588,
+        "annual_turnover": 0.1383194872684576,
+        "drawdown": {
+          "max_dd": -0.11964363749176543,
+          "peak_date": "2020-01-16",
+          "trough_date": "2020-03-18",
+          "recovery_date": "2021-06-24",
+          "peak_to_trough_trading_days": 42,
+          "trough_to_recovery_trading_days": 320,
+          "time_underwater_pct": 0.8827775867995875
+        }
+      },
+      "MR_notrend": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.02922702884611761,
+        "annualized_vol": 0.02483900849026517,
+        "sharpe": 0.35166038719365145,
+        "calmar": 0.6648957358451819,
+        "total_return": 0.3955851992022006,
+        "terminal_100k": 139558.51992022005,
+        "worst_month": -0.013355482587535605,
+        "annual_turnover": 4.477035021296735,
+        "drawdown": {
+          "max_dd": -0.04395731130530667,
+          "peak_date": "2020-03-10",
+          "trough_date": "2021-02-25",
+          "recovery_date": "2022-12-28",
+          "peak_to_trough_trading_days": 243,
+          "trough_to_recovery_trading_days": 464,
+          "time_underwater_pct": 0.6287383980749398
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.054045841657372584,
+        "annualized_vol": 0.07620224134792117,
+        "sharpe": 0.46237214493610296,
+        "calmar": 0.47394166809636207,
+        "total_return": 0.8386031719089317,
+        "terminal_100k": 183860.31719089317,
+        "worst_month": -0.06788441282968971,
+        "annual_turnover": 1.6795765620678462,
+        "drawdown": {
+          "max_dd": -0.11403479646441206,
+          "peak_date": "2015-06-23",
+          "trough_date": "2016-02-09",
+          "recovery_date": "2016-06-01",
+          "peak_to_trough_trading_days": 159,
+          "trough_to_recovery_trading_days": 78,
+          "time_underwater_pct": 0.9034032313509797
+        }
+      },
+      "bench_SPY": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.13427913642393197,
+        "annualized_vol": 0.17611674435321187,
+        "sharpe": 0.6893977193529421,
+        "calmar": 0.3982505044603223,
+        "total_return": 3.2965351097346414,
+        "terminal_100k": 429653.5109734641,
+        "worst_month": -0.12487138221696192,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.33717254572193567,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-23",
+          "recovery_date": "2020-08-10",
+          "peak_to_trough_trading_days": 23,
+          "trough_to_recovery_trading_days": 97,
+          "time_underwater_pct": 0.8525266414575455
+        }
+      },
+      "bench_QQQ": {
+        "start": "2015-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.18281573355300762,
+        "annualized_vol": 0.21946541675116957,
+        "sharpe": 0.7837739756051157,
+        "calmar": 0.5205648774475508,
+        "total_return": 5.976895891950558,
+        "terminal_100k": 697689.5891950558,
+        "worst_month": -0.1359573718408258,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.3511872227135169,
+          "peak_date": "2021-12-27",
+          "trough_date": "2022-11-03",
+          "recovery_date": "2023-12-13",
+          "peak_to_trough_trading_days": 216,
+          "trough_to_recovery_trading_days": 278,
+          "time_underwater_pct": 0.8587143348229632
+        }
+      }
+    },
+    "from_2018": {
+      "R50d": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.20878049206116844,
+        "annualized_vol": 0.1898474557105117,
+        "sharpe": 0.9593513566158888,
+        "calmar": 0.9981149940390696,
+        "total_return": 4.077783525818061,
+        "terminal_100k": 507778.35258180613,
+        "worst_month": -0.12417211579511589,
+        "annual_turnover": 11.521163322868995,
+        "drawdown": {
+          "max_dd": -0.2091747877830158,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-18",
+          "recovery_date": "2020-07-09",
+          "peak_to_trough_trading_days": 20,
+          "trough_to_recovery_trading_days": 78,
+          "time_underwater_pct": 0.8922934076137419
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.034980479807475096,
+        "annualized_vol": 0.05678760866737306,
+        "sharpe": 0.1751955076452019,
+        "calmar": 0.4765589831569409,
+        "total_return": 0.3426435561205059,
+        "terminal_100k": 134264.3556120506,
+        "worst_month": -0.044063114721934915,
+        "annual_turnover": 1.670254251601661,
+        "drawdown": {
+          "max_dd": -0.07340220422611421,
+          "peak_date": "2024-07-12",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-12-22",
+          "peak_to_trough_trading_days": 178,
+          "trough_to_recovery_trading_days": 185,
+          "time_underwater_pct": 0.9090064995357474
+        }
+      },
+      "MR_sleeve": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.03314367994554024,
+        "annualized_vol": 0.01687951610787397,
+        "sharpe": 0.3964673102748738,
+        "calmar": 1.440143995156379,
+        "total_return": 0.32236070609383427,
+        "terminal_100k": 132236.07060938343,
+        "worst_month": -0.013355482587535605,
+        "annual_turnover": 3.22073482428115,
+        "drawdown": {
+          "max_dd": -0.023014143069729154,
+          "peak_date": "2020-09-09",
+          "trough_date": "2021-02-25",
+          "recovery_date": "2021-11-12",
+          "peak_to_trough_trading_days": 116,
+          "trough_to_recovery_trading_days": 182,
+          "time_underwater_pct": 0.5041782729805014
+        }
+      },
+      "R50d_plus": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.1856450538933727,
+        "annualized_vol": 0.19704310831179125,
+        "sharpe": 0.8331427787364281,
+        "calmar": 0.8481151466190228,
+        "total_return": 3.3028157537534666,
+        "terminal_100k": 430281.57537534664,
+        "worst_month": -0.11653234600917273,
+        "annual_turnover": 14.111621539527652,
+        "drawdown": {
+          "max_dd": -0.21889133171767927,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-18",
+          "recovery_date": "2020-07-20",
+          "peak_to_trough_trading_days": 20,
+          "trough_to_recovery_trading_days": 85,
+          "time_underwater_pct": 0.8918291550603529
+        }
+      },
+      "VRP_nogate": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.036355285202637644,
+        "annualized_vol": 0.06432341309830338,
+        "sharpe": 0.18256140314465474,
+        "calmar": 0.3038630884583397,
+        "total_return": 0.35800415516826645,
+        "terminal_100k": 135800.41551682664,
+        "worst_month": -0.08484502511101588,
+        "annual_turnover": 0.11229031548123107,
+        "drawdown": {
+          "max_dd": -0.11964363749176476,
+          "peak_date": "2020-01-16",
+          "trough_date": "2020-03-18",
+          "recovery_date": "2021-06-24",
+          "peak_to_trough_trading_days": 42,
+          "trough_to_recovery_trading_days": 320,
+          "time_underwater_pct": 0.8987929433611885
+        }
+      },
+      "MR_notrend": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.03562870751963598,
+        "annualized_vol": 0.027167524001020165,
+        "sharpe": 0.34333233857203893,
+        "calmar": 0.8105297267199811,
+        "total_return": 0.34986692751523507,
+        "terminal_100k": 134986.69275152351,
+        "worst_month": -0.013355482587535605,
+        "annual_turnover": 4.434345047923323,
+        "drawdown": {
+          "max_dd": -0.043957311305307445,
+          "peak_date": "2020-03-10",
+          "trough_date": "2021-02-25",
+          "recovery_date": "2022-12-28",
+          "peak_to_trough_trading_days": 243,
+          "trough_to_recovery_trading_days": 464,
+          "time_underwater_pct": 0.5506035283194057
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.03248318565202868,
+        "annualized_vol": 0.057947046600917554,
+        "sharpe": 0.13105125591879047,
+        "calmar": 0.3877345115330069,
+        "total_return": 0.3151336441819408,
+        "terminal_100k": 131513.36441819408,
+        "worst_month": -0.044063114721934915,
+        "annual_turnover": 1.670254251601661,
+        "drawdown": {
+          "max_dd": -0.08377687486109542,
+          "peak_date": "2018-01-12",
+          "trough_date": "2019-08-23",
+          "recovery_date": "2021-04-15",
+          "peak_to_trough_trading_days": 405,
+          "trough_to_recovery_trading_days": 413,
+          "time_underwater_pct": 0.9201485608170845
+        }
+      },
+      "bench_SPY": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.14172473592136559,
+        "annualized_vol": 0.19129095474814162,
+        "sharpe": 0.6540429213146394,
+        "calmar": 0.4203329651822994,
+        "total_return": 2.1136582936298494,
+        "terminal_100k": 311365.8293629849,
+        "worst_month": -0.12487138221696192,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.33717254572193556,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-23",
+          "recovery_date": "2020-08-10",
+          "peak_to_trough_trading_days": 23,
+          "trough_to_recovery_trading_days": 97,
+          "time_underwater_pct": 0.8546889507892294
+        }
+      },
+      "bench_QQQ": {
+        "start": "2018-01-02",
+        "end": "2026-07-29",
+        "cagr": 0.1914628540512684,
+        "annualized_vol": 0.23881212665276383,
+        "sharpe": 0.7458032357478162,
+        "calmar": 0.5451874147695164,
+        "total_return": 3.4871423551717324,
+        "terminal_100k": 448714.23551717325,
+        "worst_month": -0.1359573718408258,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.35118722271351643,
+          "peak_date": "2021-12-27",
+          "trough_date": "2022-11-03",
+          "recovery_date": "2023-12-13",
+          "peak_to_trough_trading_days": 216,
+          "trough_to_recovery_trading_days": 278,
+          "time_underwater_pct": 0.8658310120705663
+        }
+      }
+    },
+    "last_3y": {
+      "R50d": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.22688384102974268,
+        "annualized_vol": 0.20090877702899856,
+        "sharpe": 0.9014379909720092,
+        "calmar": 1.4451883830109853,
+        "total_return": 0.8449511053386618,
+        "terminal_100k": 184495.1105338662,
+        "worst_month": -0.06821711583122736,
+        "annual_turnover": 11.138019284989605,
+        "drawdown": {
+          "max_dd": -0.15699257183139015,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-04-08",
+          "recovery_date": "2025-08-12",
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": 86,
+          "time_underwater_pct": 0.8723404255319149
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.04135399085509461,
+        "annualized_vol": 0.0525598920375154,
+        "sharpe": -0.04555258495920194,
+        "calmar": 0.5633889512051188,
+        "total_return": 0.12904392724809743,
+        "terminal_100k": 112904.39272480975,
+        "worst_month": -0.032809265313357594,
+        "annual_turnover": 1.5657043185434607,
+        "drawdown": {
+          "max_dd": -0.07340220422611454,
+          "peak_date": "2024-07-12",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-12-22",
+          "peak_to_trough_trading_days": 178,
+          "trough_to_recovery_trading_days": 185,
+          "time_underwater_pct": 0.8763297872340425
+        }
+      },
+      "MR_sleeve": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.06227775279870418,
+        "annualized_vol": 0.015709793385181255,
+        "sharpe": 1.0386274392104518,
+        "calmar": 5.6532434373274585,
+        "total_return": 0.19836342512759542,
+        "terminal_100k": 119836.34251275954,
+        "worst_month": -0.004005635911371153,
+        "annual_turnover": 4.607358318098721,
+        "drawdown": {
+          "max_dd": -0.011016287108298606,
+          "peak_date": "2025-02-21",
+          "trough_date": "2025-03-04",
+          "recovery_date": "2025-05-19",
+          "peak_to_trough_trading_days": 7,
+          "trough_to_recovery_trading_days": 53,
+          "time_underwater_pct": 0.18617021276595744
+        }
+      },
+      "R50d_plus": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.19708488033566351,
+        "annualized_vol": 0.1966701220672279,
+        "sharpe": 0.7910525535634609,
+        "calmar": 1.2420472918310028,
+        "total_return": 0.713959364807403,
+        "terminal_100k": 171395.9364807403,
+        "worst_month": -0.09396756321140665,
+        "annual_turnover": 14.295296234138728,
+        "drawdown": {
+          "max_dd": -0.15867743654520972,
+          "peak_date": "2024-07-10",
+          "trough_date": "2024-08-07",
+          "recovery_date": "2024-12-04",
+          "peak_to_trough_trading_days": 20,
+          "trough_to_recovery_trading_days": 83,
+          "time_underwater_pct": 0.8670212765957447
+        }
+      },
+      "VRP_nogate": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.05290390689247637,
+        "annualized_vol": 0.059240238598010114,
+        "sharpe": 0.15289350542278662,
+        "calmar": 0.6618476301985272,
+        "total_return": 0.16696798531926094,
+        "terminal_100k": 116696.79853192609,
+        "worst_month": -0.03930047361193845,
+        "annual_turnover": 0.10403954748570989,
+        "drawdown": {
+          "max_dd": -0.07993366521023482,
+          "peak_date": "2024-07-12",
+          "trough_date": "2025-04-08",
+          "recovery_date": "2025-10-27",
+          "peak_to_trough_trading_days": 185,
+          "trough_to_recovery_trading_days": 139,
+          "time_underwater_pct": 0.8337765957446809
+        }
+      },
+      "MR_notrend": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.06798688888505078,
+        "annualized_vol": 0.023499325396671777,
+        "sharpe": 0.92977570791035,
+        "calmar": 4.430724440318706,
+        "total_return": 0.21775773608331872,
+        "terminal_100k": 121775.77360833187,
+        "worst_month": -0.004005635911371153,
+        "annual_turnover": 5.275091407678246,
+        "drawdown": {
+          "max_dd": -0.01534441823246413,
+          "peak_date": "2025-04-02",
+          "trough_date": "2025-04-08",
+          "recovery_date": "2025-04-09",
+          "peak_to_trough_trading_days": 4,
+          "trough_to_recovery_trading_days": 1,
+          "time_underwater_pct": 0.1875
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.04135399085509461,
+        "annualized_vol": 0.0525598920375154,
+        "sharpe": -0.04555258495920194,
+        "calmar": 0.5633889512051188,
+        "total_return": 0.12904392724809743,
+        "terminal_100k": 112904.39272480975,
+        "worst_month": -0.032809265313357594,
+        "annual_turnover": 1.5657043185434607,
+        "drawdown": {
+          "max_dd": -0.07340220422611454,
+          "peak_date": "2024-07-12",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-12-22",
+          "peak_to_trough_trading_days": 178,
+          "trough_to_recovery_trading_days": 185,
+          "time_underwater_pct": 0.8763297872340425
+        }
+      },
+      "bench_SPY": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.1836829876485624,
+        "annualized_vol": 0.15336922576642736,
+        "sharpe": 0.8902752672241443,
+        "calmar": 0.9793698817247569,
+        "total_return": 0.6571252282165947,
+        "terminal_100k": 165712.52282165946,
+        "worst_month": -0.055719107776287635,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.1875522119641666,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-04-08",
+          "recovery_date": "2025-06-26",
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": 54,
+          "time_underwater_pct": 0.8138297872340425
+        }
+      },
+      "bench_QQQ": {
+        "start": "2023-07-31",
+        "end": "2026-07-29",
+        "cagr": 0.20674529818729126,
+        "annualized_vol": 0.2038991800414817,
+        "sharpe": 0.8088012966176169,
+        "calmar": 0.9080395538525451,
+        "total_return": 0.7557222227575278,
+        "terminal_100k": 175572.22227575278,
+        "worst_month": -0.10139875267484666,
+        "annual_turnover": 0.0,
+        "drawdown": {
+          "max_dd": -0.2276831414558228,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-04-08",
+          "recovery_date": "2025-06-24",
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": 52,
+          "time_underwater_pct": 0.8444148936170213
+        }
+      }
+    }
+  },
+  "crises": {
+    "aug_2015_flash": {
+      "R50d": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.5271080927029487,
+        "annualized_vol": 0.141584688643251,
+        "sharpe": -5.213984070004805,
+        "calmar": -4.037218818728198,
+        "total_return": -0.1199587696475769,
+        "terminal_100k": 88004.12303524232,
+        "worst_month": -0.124764340082122,
+        "annual_turnover": 19.41522359383422,
+        "drawdown": {
+          "max_dd": -0.13056218064221692,
+          "peak_date": "2015-08-05",
+          "trough_date": "2015-09-16",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 29,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9534883720930233
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.07603767408758422,
+        "annualized_vol": 0.02786787475014119,
+        "sharpe": -2.8370029485343573,
+        "calmar": -4.72393410669835,
+        "total_return": -0.013403846388617358,
+        "terminal_100k": 98659.61536113826,
+        "worst_month": -0.00957524315485414,
+        "annual_turnover": 4.102315263605692,
+        "drawdown": {
+          "max_dd": -0.01609626052568469,
+          "peak_date": "2015-08-10",
+          "trough_date": "2015-09-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 33,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9302325581395349
+        }
+      },
+      "MR_sleeve": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.04341800959416797,
+        "annualized_vol": 0.03794250260791321,
+        "sharpe": -1.1610091487217185,
+        "calmar": -2.50914122996464,
+        "total_return": -0.007545662492582927,
+        "terminal_100k": 99245.43375074171,
+        "worst_month": -0.007562715221373306,
+        "annual_turnover": 2.344186046511628,
+        "drawdown": {
+          "max_dd": -0.017303932148442613,
+          "peak_date": "2015-08-20",
+          "trough_date": "2015-08-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 3,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.6744186046511628
+        }
+      },
+      "R50d_plus": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.5502702586804975,
+        "annualized_vol": 0.1548120889431412,
+        "sharpe": -5.079394073063414,
+        "calmar": -4.069460976028,
+        "total_return": -0.12746787595800324,
+        "terminal_100k": 87253.21240419967,
+        "worst_month": -0.1294398349016368,
+        "annual_turnover": 26.01467288791198,
+        "drawdown": {
+          "max_dd": -0.13521944599591396,
+          "peak_date": "2015-08-05",
+          "trough_date": "2015-09-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 36,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9534883720930233
+        }
+      },
+      "VRP_nogate": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.29058953845854985,
+        "annualized_vol": 0.09078206943582967,
+        "sharpe": -3.738689586567721,
+        "calmar": -4.199277061326719,
+        "total_return": -0.05689961559377621,
+        "terminal_100k": 94310.03844062237,
+        "worst_month": -0.057441053180611434,
+        "annual_turnover": 0.7998118848336919,
+        "drawdown": {
+          "max_dd": -0.06919989660476011,
+          "peak_date": "2015-08-10",
+          "trough_date": "2015-09-01",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 16,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9302325581395349
+        }
+      },
+      "MR_notrend": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.057652172290493686,
+        "annualized_vol": 0.0421403016767469,
+        "sharpe": -1.397148290634566,
+        "calmar": -3.331738231283026,
+        "total_return": -0.010081282731680408,
+        "terminal_100k": 98991.87172683196,
+        "worst_month": -0.007562715221373306,
+        "annual_turnover": 4.688372093023256,
+        "drawdown": {
+          "max_dd": -0.017303932148442613,
+          "peak_date": "2015-08-20",
+          "trough_date": "2015-08-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 3,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.6744186046511628
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2015-08-03",
+        "end": "2015-10-01",
+        "cagr": -0.14373945646434572,
+        "annualized_vol": 0.05568234066230213,
+        "sharpe": -2.765332347587557,
+        "calmar": -4.577442535800687,
+        "total_return": -0.026131724501258335,
+        "terminal_100k": 97386.82754987417,
+        "worst_month": -0.019027010765739205,
+        "annual_turnover": 4.102315263605692,
+        "drawdown": {
+          "max_dd": -0.031401695453333045,
+          "peak_date": "2015-08-10",
+          "trough_date": "2015-09-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 33,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9302325581395349
+        }
+      }
+    },
+    "volmageddon_2018": {
+      "R50d": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.261555478762727,
+        "annualized_vol": 0.22153045408625865,
+        "sharpe": -1.3325116733187996,
+        "calmar": -2.089298859874863,
+        "total_return": -0.07522863860731888,
+        "terminal_100k": 92477.13613926811,
+        "worst_month": -0.046168620541435335,
+        "annual_turnover": 12.06670188500602,
+        "drawdown": {
+          "max_dd": -0.12518815942798756,
+          "peak_date": "2018-01-26",
+          "trough_date": "2018-02-08",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 9,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846153846153847
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.06984477451179183,
+        "annualized_vol": 0.039230026318381364,
+        "sharpe": -2.2446357598863136,
+        "calmar": -2.7413841803588,
+        "total_return": -0.01850227458221798,
+        "terminal_100k": 98149.7725417782,
+        "worst_month": -0.012252876906039267,
+        "annual_turnover": 2.3123673041554658,
+        "drawdown": {
+          "max_dd": -0.02547792279980632,
+          "peak_date": "2018-01-26",
+          "trough_date": "2018-03-23",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 39,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846153846153847
+        }
+      },
+      "MR_sleeve": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.00941206112956805,
+        "annualized_vol": 0.035591114653463034,
+        "sharpe": -0.7096501956763399,
+        "calmar": -0.6043746655160639,
+        "total_return": -0.0024362388166427884,
+        "terminal_100k": 99756.37611833573,
+        "worst_month": -0.0059925901455686326,
+        "annual_turnover": 4.652307692307692,
+        "drawdown": {
+          "max_dd": -0.015573222483658,
+          "peak_date": "2018-02-02",
+          "trough_date": "2018-03-23",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9076923076923077
+        }
+      },
+      "R50d_plus": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.3290574356816458,
+        "annualized_vol": 0.2383668938816452,
+        "sharpe": -1.6237001267380038,
+        "calmar": -2.340752165913878,
+        "total_return": -0.09781454131689449,
+        "terminal_100k": 90218.54586831055,
+        "worst_month": -0.06252918922641182,
+        "annual_turnover": 18.758223640401944,
+        "drawdown": {
+          "max_dd": -0.14057764870343503,
+          "peak_date": "2018-01-26",
+          "trough_date": "2018-04-06",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 48,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846153846153847
+        }
+      },
+      "VRP_nogate": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.303533233729239,
+        "annualized_vol": 0.11727597635791043,
+        "sharpe": -3.163202132245623,
+        "calmar": -3.040292634728293,
+        "total_return": -0.08908411160698348,
+        "terminal_100k": 91091.58883930165,
+        "worst_month": -0.08484502511101588,
+        "annual_turnover": 1.0425150282185383,
+        "drawdown": {
+          "max_dd": -0.09983684802642867,
+          "peak_date": "2018-01-26",
+          "trough_date": "2018-04-02",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 44,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846153846153847
+        }
+      },
+      "MR_notrend": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.00941206112956805,
+        "annualized_vol": 0.035591114653463034,
+        "sharpe": -0.7096501956763399,
+        "calmar": -0.6043746655160639,
+        "total_return": -0.0024362388166427884,
+        "terminal_100k": 99756.37611833573,
+        "worst_month": -0.0059925901455686326,
+        "annual_turnover": 4.652307692307692,
+        "drawdown": {
+          "max_dd": -0.015573222483658,
+          "peak_date": "2018-02-02",
+          "trough_date": "2018-03-23",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9076923076923077
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2018-01-26",
+        "end": "2018-04-30",
+        "cagr": -0.14155120222413586,
+        "annualized_vol": 0.06965316703737283,
+        "sharpe": -2.3916700352447187,
+        "calmar": -3.0605820321261845,
+        "total_return": -0.03860353045698495,
+        "terminal_100k": 96139.64695430151,
+        "worst_month": -0.024678934533421404,
+        "annual_turnover": 2.3123673041554658,
+        "drawdown": {
+          "max_dd": -0.046249765808695,
+          "peak_date": "2018-01-26",
+          "trough_date": "2018-03-23",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 39,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846153846153847
+        }
+      }
+    },
+    "covid_crash": {
+      "R50d": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.8325686176467401,
+        "annualized_vol": 0.3979626713268373,
+        "sharpe": -4.298989096226898,
+        "calmar": -3.980253196242712,
+        "total_return": -0.15651046020136683,
+        "terminal_100k": 84348.95397986332,
+        "worst_month": -0.10735167797714507,
+        "annual_turnover": 20.727853095100386,
+        "drawdown": {
+          "max_dd": -0.2091747877830159,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-18",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 20,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9583333333333334
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.25252581566537524,
+        "annualized_vol": 0.06667062492764333,
+        "sharpe": -4.438785013898276,
+        "calmar": -8.580931609784026,
+        "total_return": -0.027338910436270458,
+        "terminal_100k": 97266.10895637295,
+        "worst_month": -0.027554798957814874,
+        "annual_turnover": 2.162703743069708,
+        "drawdown": {
+          "max_dd": -0.029428717900215395,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-02-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 4,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9583333333333334
+        }
+      },
+      "MR_sleeve": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.03944785057231848,
+        "annualized_vol": 0.051129490044230196,
+        "sharpe": -0.9034872296160837,
+        "calmar": -2.7309319813300834,
+        "total_return": -0.0038257112680013527,
+        "terminal_100k": 99617.42887319987,
+        "worst_month": -0.01401425843626214,
+        "annual_turnover": 4.2,
+        "drawdown": {
+          "max_dd": -0.01444483086433579,
+          "peak_date": "2020-02-24",
+          "trough_date": "2020-02-27",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 3,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.8333333333333334
+        }
+      },
+      "R50d_plus": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.8417681473623996,
+        "annualized_vol": 0.4180937153916688,
+        "sharpe": -4.207135052587441,
+        "calmar": -3.845598364982731,
+        "total_return": -0.1610380248878024,
+        "terminal_100k": 83896.19751121975,
+        "worst_month": -0.11936533478425515,
+        "annual_turnover": 25.191184628548154,
+        "drawdown": {
+          "max_dd": -0.21889133171767916,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-18",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 20,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9583333333333334
+        }
+      },
+      "VRP_nogate": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.6862475723196633,
+        "annualized_vol": 0.12915598112536747,
+        "sharpe": -8.947722700049228,
+        "calmar": -5.877331121137738,
+        "total_return": -0.10451995214757015,
+        "terminal_100k": 89548.00478524299,
+        "worst_month": -0.057003759205598525,
+        "annual_turnover": 1.1964288901397437,
+        "drawdown": {
+          "max_dd": -0.11676176791394033,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-03-18",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 20,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9583333333333334
+        }
+      },
+      "MR_notrend": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.23481002053454292,
+        "annualized_vol": 0.14546960489721472,
+        "sharpe": -1.8183934205066061,
+        "calmar": -6.890122690584948,
+        "total_return": -0.025166585686876797,
+        "terminal_100k": 97483.34143131232,
+        "worst_month": -0.01401425843626214,
+        "annual_turnover": 6.300000000000002,
+        "drawdown": {
+          "max_dd": -0.0340792219644217,
+          "peak_date": "2020-03-10",
+          "trough_date": "2020-03-16",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 4,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.7916666666666666
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2020-02-19",
+        "end": "2020-03-23",
+        "cagr": -0.25252581566537524,
+        "annualized_vol": 0.06667062492764333,
+        "sharpe": -4.438785013898276,
+        "calmar": -8.580931609784026,
+        "total_return": -0.027338910436270458,
+        "terminal_100k": 97266.10895637295,
+        "worst_month": -0.027554798957814874,
+        "annual_turnover": 2.162703743069708,
+        "drawdown": {
+          "max_dd": -0.029428717900215395,
+          "peak_date": "2020-02-19",
+          "trough_date": "2020-02-25",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 4,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9583333333333334
+        }
+      }
+    },
+    "inflation_bear_2022": {
+      "R50d": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": -0.09376415862154397,
+        "annualized_vol": 0.12335904314092663,
+        "sharpe": -0.8506278549775682,
+        "calmar": -0.846741258285141,
+        "total_return": -0.07371809037933119,
+        "terminal_100k": 92628.19096206687,
+        "worst_month": -0.08226186632562282,
+        "annual_turnover": 10.621465537023546,
+        "drawdown": {
+          "max_dd": -0.11073531341963827,
+          "peak_date": "2022-04-18",
+          "trough_date": "2022-10-04",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 117,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9642857142857143
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": -0.0392264240161182,
+        "annualized_vol": 0.06308568657250531,
+        "sharpe": -0.8261319302401982,
+        "calmar": -0.7071805262789456,
+        "total_return": -0.030644588650796778,
+        "terminal_100k": 96935.54113492032,
+        "worst_month": -0.025813988123833065,
+        "annual_turnover": 1.7781111513516124,
+        "drawdown": {
+          "max_dd": -0.05546875593778078,
+          "peak_date": "2022-01-12",
+          "trough_date": "2022-05-09",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 80,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846938775510204
+        }
+      },
+      "MR_sleeve": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": 0.0038622674395309975,
+        "annualized_vol": 0.012411529448670194,
+        "sharpe": -0.8184684123254486,
+        "calmar": 0.2670975702343364,
+        "total_return": 0.00300269867748848,
+        "terminal_100k": 100300.26986774885,
+        "worst_month": -0.00782553529769825,
+        "annual_turnover": 1.0285714285714287,
+        "drawdown": {
+          "max_dd": -0.014460136931019107,
+          "peak_date": "2022-01-11",
+          "trough_date": "2022-01-27",
+          "recovery_date": "2022-09-16",
+          "peak_to_trough_trading_days": 11,
+          "trough_to_recovery_trading_days": 160,
+          "time_underwater_pct": 0.8826530612244898
+        }
+      },
+      "R50d_plus": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": -0.14574614602788694,
+        "annualized_vol": 0.15162692457333607,
+        "sharpe": -1.0556647540700779,
+        "calmar": -1.1387299598843872,
+        "total_return": -0.1153125886854649,
+        "terminal_100k": 88468.74113145351,
+        "worst_month": -0.1060406322473677,
+        "annual_turnover": 12.683375871556942,
+        "drawdown": {
+          "max_dd": -0.1279900864667548,
+          "peak_date": "2022-04-19",
+          "trough_date": "2022-10-04",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 116,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846938775510204
+        }
+      },
+      "VRP_nogate": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": -0.03459073079963171,
+        "annualized_vol": 0.06662816480272782,
+        "sharpe": -0.7065442041987108,
+        "calmar": -0.6930987812456838,
+        "total_return": -0.02700879042974136,
+        "terminal_100k": 97299.12095702587,
+        "worst_month": -0.0222606296467609,
+        "annual_turnover": 0.06592729344911197,
+        "drawdown": {
+          "max_dd": -0.049907360589298566,
+          "peak_date": "2022-01-12",
+          "trough_date": "2022-05-09",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 80,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9795918367346939
+        }
+      },
+      "MR_notrend": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": 0.002946741916477924,
+        "annualized_vol": 0.03207633831865933,
+        "sharpe": -0.33156852681226395,
+        "calmar": 0.20378381826777392,
+        "total_return": 0.002291160871295217,
+        "terminal_100k": 100229.11608712953,
+        "worst_month": -0.00782553529769825,
+        "annual_turnover": 5.914285714285715,
+        "drawdown": {
+          "max_dd": -0.014460136931019107,
+          "peak_date": "2022-01-11",
+          "trough_date": "2022-01-27",
+          "recovery_date": "2022-04-13",
+          "peak_to_trough_trading_days": 11,
+          "trough_to_recovery_trading_days": 53,
+          "time_underwater_pct": 0.8877551020408163
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2022-01-03",
+        "end": "2022-10-12",
+        "cagr": -0.0392264240161182,
+        "annualized_vol": 0.06308568657250531,
+        "sharpe": -0.8261319302401982,
+        "calmar": -0.7071805262789456,
+        "total_return": -0.030644588650796778,
+        "terminal_100k": 96935.54113492032,
+        "worst_month": -0.025813988123833065,
+        "annual_turnover": 1.7781111513516124,
+        "drawdown": {
+          "max_dd": -0.05546875593778078,
+          "peak_date": "2022-01-12",
+          "trough_date": "2022-05-09",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 80,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9846938775510204
+        }
+      }
+    },
+    "tariff_2025": {
+      "R50d": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": -0.08605425911500753,
+        "annualized_vol": 0.17811342167803437,
+        "sharpe": -0.6525641369489127,
+        "calmar": -0.5481422344455233,
+        "total_return": -0.03231758431963072,
+        "terminal_100k": 96768.24156803693,
+        "worst_month": -0.06572532853808644,
+        "annual_turnover": 14.380336196206938,
+        "drawdown": {
+          "max_dd": -0.15699257183139015,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-04-08",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9782608695652174
+        }
+      },
+      "VRP_sleeve": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": 0.01185938860155944,
+        "annualized_vol": 0.0427758250108918,
+        "sharpe": -0.6870440504636582,
+        "calmar": 0.5413183577955996,
+        "total_return": 0.004313422080732154,
+        "terminal_100k": 100431.34220807321,
+        "worst_month": -0.012908167664245518,
+        "annual_turnover": 2.1209305464346837,
+        "drawdown": {
+          "max_dd": -0.021908343640615113,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-06-24",
+          "peak_to_trough_trading_days": 27,
+          "trough_to_recovery_trading_days": 59,
+          "time_underwater_pct": 0.9239130434782609
+        }
+      },
+      "MR_sleeve": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": 0.02272865022828041,
+        "annualized_vol": 0.017121277640768623,
+        "sharpe": -1.1368410547317576,
+        "calmar": 2.063186081194187,
+        "total_return": 0.008238619841634875,
+        "terminal_100k": 100823.8619841635,
+        "worst_month": -0.005670457484775904,
+        "annual_turnover": 2.191304347826087,
+        "drawdown": {
+          "max_dd": -0.011016287108298495,
+          "peak_date": "2025-02-21",
+          "trough_date": "2025-03-04",
+          "recovery_date": "2025-05-19",
+          "peak_to_trough_trading_days": 7,
+          "trough_to_recovery_trading_days": 53,
+          "time_underwater_pct": 0.6630434782608695
+        }
+      },
+      "R50d_plus": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": -0.06273535800057017,
+        "annualized_vol": 0.17796751685942197,
+        "sharpe": -0.5117584524967903,
+        "calmar": -0.3963702730213247,
+        "total_return": -0.023375798684349136,
+        "terminal_100k": 97662.42013156509,
+        "worst_month": -0.05716039224438374,
+        "annual_turnover": 16.162367302570175,
+        "drawdown": {
+          "max_dd": -0.1582746292308228,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-04-08",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9782608695652174
+        }
+      },
+      "VRP_nogate": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": -0.0445775529538982,
+        "annualized_vol": 0.07688165569336178,
+        "sharpe": -1.1023064922551793,
+        "calmar": -0.7834193473469654,
+        "total_return": -0.016510417632094487,
+        "terminal_100k": 98348.95823679055,
+        "worst_month": -0.024464870916986015,
+        "annual_turnover": 0.28799494335722736,
+        "drawdown": {
+          "max_dd": -0.05690126635863568,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-04-08",
+          "recovery_date": null,
+          "peak_to_trough_trading_days": 34,
+          "trough_to_recovery_trading_days": null,
+          "time_underwater_pct": 0.9782608695652174
+        }
+      },
+      "MR_notrend": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": 0.07411475898307773,
+        "annualized_vol": 0.05057392373677799,
+        "sharpe": 0.6065762458864068,
+        "calmar": 4.83007943737302,
+        "total_return": 0.026445662964493355,
+        "terminal_100k": 102644.56629644934,
+        "worst_month": -0.005670457484775904,
+        "annual_turnover": 6.573913043478262,
+        "drawdown": {
+          "max_dd": -0.015344418232464352,
+          "peak_date": "2025-04-02",
+          "trough_date": "2025-04-08",
+          "recovery_date": "2025-04-09",
+          "peak_to_trough_trading_days": 4,
+          "trough_to_recovery_trading_days": 1,
+          "time_underwater_pct": 0.3804347826086957
+        }
+      },
+      "VRP_actual_svxy": {
+        "start": "2025-02-18",
+        "end": "2025-06-30",
+        "cagr": 0.01185938860155944,
+        "annualized_vol": 0.0427758250108918,
+        "sharpe": -0.6870440504636582,
+        "calmar": 0.5413183577955996,
+        "total_return": 0.004313422080732154,
+        "terminal_100k": 100431.34220807321,
+        "worst_month": -0.012908167664245518,
+        "annual_turnover": 2.1209305464346837,
+        "drawdown": {
+          "max_dd": -0.021908343640615113,
+          "peak_date": "2025-02-19",
+          "trough_date": "2025-03-28",
+          "recovery_date": "2025-06-24",
+          "peak_to_trough_trading_days": 27,
+          "trough_to_recovery_trading_days": 59,
+          "time_underwater_pct": 0.9239130434782609
+        }
+      }
+    }
+  },
+  "yearly": {
+    "R50d": {
+      "2012": 0.00033428776218591416,
+      "2013": 0.4085160226078135,
+      "2014": 0.22781922958744416,
+      "2015": -0.08345314099821788,
+      "2016": 0.12794909015201084,
+      "2017": 0.7379394201844489,
+      "2018": -0.0882275417963736,
+      "2019": 0.37612768057829293,
+      "2020": 0.4541523787378896,
+      "2021": 0.3305777971936046,
+      "2022": -0.1177149939428912,
+      "2023": 0.3776246292728973,
+      "2024": 0.3030578646829514,
+      "2025": 0.22478332872233753,
+      "2026": 0.07824145862991494
+    },
+    "VRP_sleeve": {
+      "2012": 0.03737168204969943,
+      "2013": 0.029866869922591466,
+      "2014": 0.018719309810071083,
+      "2015": 0.017092528868830392,
+      "2016": 0.048723131605094894,
+      "2017": 0.11666356402634137,
+      "2018": -0.023318032879311112,
+      "2019": 0.03760386322904519,
+      "2020": -0.007474040547924776,
+      "2021": 0.05954565548328827,
+      "2022": 0.0018263453253604123,
+      "2023": 0.17720713275452682,
+      "2024": 0.003447167627343539,
+      "2025": 0.07057635017307673,
+      "2026": -0.00560955369080729
+    },
+    "MR_sleeve": {
+      "2012": 0.007567759290607601,
+      "2013": 0.014579852595319354,
+      "2014": 0.005605685571722807,
+      "2015": 0.010811483072840966,
+      "2016": -0.008518171184781487,
+      "2017": 0.02293276912757536,
+      "2018": 0.01486321368943666,
+      "2019": 0.024184057931769587,
+      "2020": -0.00018497456937627277,
+      "2021": 0.01594900300475599,
+      "2022": 0.011989212958680495,
+      "2023": 0.05838839219381309,
+      "2024": 0.08323784004351675,
+      "2025": 0.05183456390484964,
+      "2026": 0.026314900271219077
+    },
+    "R50d_plus": {
+      "2012": 0.04161312589037247,
+      "2013": 0.39529613993346735,
+      "2014": 0.21164734624999215,
+      "2015": -0.04805665993944852,
+      "2016": 0.17463317652086108,
+      "2017": 0.7036368001866109,
+      "2018": -0.12499637408393216,
+      "2019": 0.2650586052874373,
+      "2020": 0.4544407626415139,
+      "2021": 0.32056405916180664,
+      "2022": -0.13691438432880687,
+      "2023": 0.47604110543521627,
+      "2024": 0.23380826354424622,
+      "2025": 0.21948258990199432,
+      "2026": 0.055847343093129886
+    },
+    "VRP_nogate": {
+      "2012": 0.04770208802461107,
+      "2013": 0.09817670065422668,
+      "2014": -0.002512612039476725,
+      "2015": 0.0010575712151468242,
+      "2016": 0.06747794318305167,
+      "2017": 0.1341911668988358,
+      "2018": -0.10422531843242511,
+      "2019": 0.11530934871979492,
+      "2020": -0.04522131447269351,
+      "2021": 0.08632601167085063,
+      "2022": 0.017176376879589617,
+      "2023": 0.16000926254493142,
+      "2024": 0.024435506126874396,
+      "2025": 0.06187926535703436,
+      "2026": 0.0210020015770771
+    },
+    "MR_notrend": {
+      "2012": 0.01392216274330127,
+      "2013": 0.014376937067670292,
+      "2014": 0.005605685571722807,
+      "2015": 0.00822896218746827,
+      "2016": 0.0024417313814024677,
+      "2017": 0.02293276912757536,
+      "2018": 0.021529350646105394,
+      "2019": 0.027681801082350743,
+      "2020": -0.021799523366330842,
+      "2021": 0.01594900300475599,
+      "2022": 0.023018248442472578,
+      "2023": 0.06432444382350666,
+      "2024": 0.08323784004351675,
+      "2025": 0.07082887426576079,
+      "2026": 0.024425429423643674
+    },
+    "VRP_actual_svxy": {
+      "2012": 0.07444863310574346,
+      "2013": 0.06058618900969126,
+      "2014": 0.03735647876606274,
+      "2015": 0.03307044436316042,
+      "2016": 0.09544705978638435,
+      "2017": 0.23536924734884446,
+      "2018": -0.04332962477575564,
+      "2019": 0.03760386322904519,
+      "2020": -0.007474040547924776,
+      "2021": 0.05954565548328827,
+      "2022": 0.0018263453253604123,
+      "2023": 0.17720713275452682,
+      "2024": 0.003447167627343539,
+      "2025": 0.07057635017307673,
+      "2026": -0.00560955369080729
+    }
+  },
+  "sleeve_correlation_to_R50d": {
+    "VRP_sleeve": 0.5011332702350833,
+    "MR_sleeve": 0.3570474780653535,
+    "VRP_nogate": 0.5431939325134298,
+    "MR_notrend": 0.2929192670192838,
+    "VRP_actual_svxy": 0.47948614850367094
+  },
+  "mr_trade_stats": {
+    "n_trades": 209,
+    "hit_rate": 0.7320574162679426,
+    "mean_per_trade": 0.005930916092919076,
+    "median_per_trade": 0.010210723853611325,
+    "worst_trade": -0.08020101679092406,
+    "best_trade": 0.12368378630927501,
+    "avg_sessions_in_market_per_year": 28.09348236318769
+  },
+  "mr_trade_stats_notrend": {
+    "n_trades": 323,
+    "hit_rate": 0.7213622291021672,
+    "mean_per_trade": 0.007659726897086717,
+    "median_per_trade": 0.0111500481241662,
+    "worst_trade": -0.19906019733515445,
+    "best_trade": 0.1684213406719235,
+    "avg_sessions_in_market_per_year": 43.49368558571636
+  },
+  "neighborhood": {
+    "vrp1.03/0.99_mr5": {
+      "cagr": 0.2018349950477305,
+      "max_dd": -0.22833478034911503,
+      "sharpe": 0.9517593407180432
+    },
+    "vrp1.03/0.99_mr10": {
+      "cagr": 0.19520935053469812,
+      "max_dd": -0.23516927954107503,
+      "sharpe": 0.9205637075900724
+    },
+    "vrp1.03/0.99_mr15": {
+      "cagr": 0.18978412360571562,
+      "max_dd": -0.2377619172166825,
+      "sharpe": 0.896971508352044
+    },
+    "vrp1.05/1.00_mr5": {
+      "cagr": 0.20370352388029866,
+      "max_dd": -0.21912365010339852,
+      "sharpe": 0.9627621605248904
+    },
+    "vrp1.05/1.00_mr10": {
+      "cagr": 0.1994039860852186,
+      "max_dd": -0.22177927536648057,
+      "sharpe": 0.9427143449678574
+    },
+    "vrp1.05/1.00_mr15": {
+      "cagr": 0.19142126697552087,
+      "max_dd": -0.2227072985705294,
+      "sharpe": 0.90797453169858
+    },
+    "vrp1.07/1.01_mr5": {
+      "cagr": 0.1981796350290288,
+      "max_dd": -0.22776823272633706,
+      "sharpe": 0.9414359318281695
+    },
+    "vrp1.07/1.01_mr10": {
+      "cagr": 0.1959169725026637,
+      "max_dd": -0.2303700373274079,
+      "sharpe": 0.932463724093801
+    },
+    "vrp1.07/1.01_mr15": {
+      "cagr": 0.19325627103740262,
+      "max_dd": -0.2312879202110426,
+      "sharpe": 0.92095846469232
+    }
+  },
+  "cost_stress_from_2015": {
+    "cagr": 0.18806162029744944,
+    "max_dd": -0.2314142410006188,
+    "sharpe": 0.8928569185930888
+  },
+  "turnover": {
+    "R50d": 13.486548279901276,
+    "VRP_sleeve": 1.7380620099722137,
+    "MR_sleeve": 3.4901074053137364,
+    "R50d_plus": 15.970769350592539,
+    "VRP_nogate": 0.1256308914686892,
+    "MR_notrend": 4.430299604296212,
+    "VRP_actual_svxy": 1.7380620099722137
+  },
+  "conclusion": {
+    "verdict": "reject",
+    "checks": {
+      "cagr_up_1pp": false,
+      "max_dd_within_1pp": true,
+      "sharpe_not_lower": false,
+      "y2022_not_worse_1pp": false
+    },
+    "deltas_from_2015": {
+      "cagr_pp": -1.1153172535467881,
+      "max_dd_pp": 0.73903144767824,
+      "sharpe": -0.07947966171778975,
+      "y2022_pp": -1.9199390385915671
+    },
+    "reason": "Failed pre-registered check(s): cagr_up_1pp, sharpe_not_lower, y2022_not_worse_1pp."
+  }
+}
