@@ -50,13 +50,17 @@ ACCOUNTS: dict[str, Account] = {
         email_tag="paper/dm42",
         cash_rotate=True,
     ),
-    "paper_r50d_asym": Account(
-        id="paper_r50d_asym",
-        strategy="r50d_asym",
+    # paper_r50d_asym was retired in favor of paper_r50d_cash (v10c A/B); the
+    # strategy module remains in live/strategies/. The new account reuses the
+    # asym Alpaca paper account and its *_ASYM_* secrets — liquidate/reset that
+    # paper account before the first r50d_cash run.
+    "paper_r50d_cash": Account(
+        id="paper_r50d_cash",
+        strategy="r50d_cash",
         paper=True,
         key_env="ALPACA_PAPER_R50D_ASYM_KEY",
         secret_env="ALPACA_PAPER_R50D_ASYM_SECRET",
-        email_tag="paper/r50d_asym",
+        email_tag="paper/r50d_cash",
     ),
     # Promote later:
     # "live_r50d": Account(

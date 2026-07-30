@@ -116,7 +116,11 @@ def fetch_closes(
     start = datetime.now(timezone.utc) - timedelta(days=strategy.HISTORY_DAYS)
     end = datetime.now(timezone.utc) - timedelta(minutes=16)
 
-    stock_symbols = [s.signal for s in strategy.SLEEVES.values() if not s.crypto]
+    # dict.fromkeys dedupes while keeping order (a traded overlay sleeve may
+    # share its signal ticker with a core sleeve, e.g. QQQ in r50d_cash).
+    stock_symbols = list(
+        dict.fromkeys(s.signal for s in strategy.SLEEVES.values() if not s.crypto)
+    )
     bars = StockHistoricalDataClient(key, secret).get_stock_bars(
         StockBarsRequest(
             symbol_or_symbols=stock_symbols,
