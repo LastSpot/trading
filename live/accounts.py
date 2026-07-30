@@ -50,6 +50,14 @@ ACCOUNTS: dict[str, Account] = {
         email_tag="paper/dm42",
         cash_rotate=True,
     ),
+    "paper_r50d_asym": Account(
+        id="paper_r50d_asym",
+        strategy="r50d_asym",
+        paper=True,
+        key_env="ALPACA_PAPER_R50D_ASYM_KEY",
+        secret_env="ALPACA_PAPER_R50D_ASYM_SECRET",
+        email_tag="paper/r50d_asym",
+    ),
     # Promote later:
     # "live_r50d": Account(
     #     id="live_r50d",

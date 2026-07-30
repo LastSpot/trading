@@ -51,6 +51,7 @@ Each run recomputes targets from adjusted Alpaca daily closes and reads held wei
 | Env var | Purpose |
 |---------|---------|
 | `ALPACA_PAPER_R50D_KEY` / `ALPACA_PAPER_R50D_SECRET` | Paper account for `paper_r50d` |
+| `ALPACA_PAPER_R50D_ASYM_KEY` / `ALPACA_PAPER_R50D_ASYM_SECRET` | Paper A/B for `paper_r50d_asym` (asymmetric TQQQ gate) |
 | `ALPACA_KEY` / `ALPACA_SECRET` | Legacy fallback for `paper_r50d` only (soft cutover) |
 | `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Optional daily email summary |
 

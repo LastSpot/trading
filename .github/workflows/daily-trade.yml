@@ -23,8 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        account: [paper_r50d]
-        # add paper_r50tilt, etc. later
+        account: [paper_r50d, paper_r50d_asym]
     concurrency:
       group: daily-paper-trade-${{ matrix.account }}
       cancel-in-progress: false
@@ -62,6 +61,8 @@ jobs:
         env:
           ALPACA_PAPER_R50D_KEY: ${{ secrets.ALPACA_PAPER_R50D_KEY }}
           ALPACA_PAPER_R50D_SECRET: ${{ secrets.ALPACA_PAPER_R50D_SECRET }}
+          ALPACA_PAPER_R50D_ASYM_KEY: ${{ secrets.ALPACA_PAPER_R50D_ASYM_KEY }}
+          ALPACA_PAPER_R50D_ASYM_SECRET: ${{ secrets.ALPACA_PAPER_R50D_ASYM_SECRET }}
           # Soft cutover: legacy names still work for paper_r50d until rotated
           ALPACA_KEY: ${{ secrets.ALPACA_KEY }}
           ALPACA_SECRET: ${{ secrets.ALPACA_SECRET }}

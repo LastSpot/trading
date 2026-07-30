@@ -3,10 +3,11 @@ from __future__ import annotations
 
 from types import ModuleType
 
-from . import dm42, r50d
+from . import dm42, r50d, r50d_asym
 
 STRATEGIES: dict[str, ModuleType] = {
     r50d.NAME: r50d,
+    r50d_asym.NAME: r50d_asym,
     dm42.NAME: dm42,
 }
 
