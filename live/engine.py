@@ -19,6 +19,7 @@ from types import ModuleType
 from zoneinfo import ZoneInfo
 
 import pandas as pd
+from alpaca.common.exceptions import APIError
 from alpaca.data.enums import Adjustment, DataFeed
 from alpaca.data.historical import CryptoHistoricalDataClient, StockHistoricalDataClient
 from alpaca.data.requests import CryptoBarsRequest, StockBarsRequest
@@ -42,11 +43,16 @@ ET = ZoneInfo("America/New_York")
 
 MAX_ORDER_FRACTION = 0.70
 MIN_NOTIONAL = 1.0
+# Sells at >= this fraction of the position go by qty instead of notional:
+# Alpaca converts notional sells to shares at its own reference price, and a
+# small price drift can push the share count above what the account holds.
+NEAR_FULL_SELL_FRACTION = 0.97
 EMAIL_TO = ["anhminhle402@gmail.com", "artificial.voidstorage@gmail.com"]
 
 # cash_rotate phases: reduce after signal close; increase next session after cash frees.
 PHASES = frozenset({"auto", "reduce", "increase"})
 BUY_POWER_BUFFER = 0.99  # leave a haircut so Alpaca BP rounding does not 403
+ALPACA_INSUFFICIENT_BP = 40310000  # Alpaca error code on the 403 order reject
 FILL_WAIT_SEC = 600
 FILL_POLL_SEC = 15
 
@@ -224,7 +230,10 @@ def plan_orders(
                     f"buy for {sym} (${notional:,.2f}) exceeds "
                     f"{MAX_ORDER_FRACTION:.0%} of equity -- refusing to trade"
                 )
-            orders.append({"symbol": sym, "action": action, "notional": notional})
+            if action == "sell" and notional >= NEAR_FULL_SELL_FRACTION * held_w * equity:
+                orders.append({"symbol": sym, "action": "exit", "qty": pos["qty"]})
+            else:
+                orders.append({"symbol": sym, "action": action, "notional": notional})
     orders.sort(key=lambda o: o["action"] == "buy")
     return orders
 
@@ -292,9 +301,15 @@ def wait_for_no_open_orders(
 
 
 def clip_buys_to_buying_power(
-    trading: TradingClient, buys: list[dict]
+    trading: TradingClient, buys: list[dict], *, strict: bool = True
 ) -> list[dict]:
-    """Scale buy notionals down if broker buying power is short (paper rounding)."""
+    """Scale buy notionals down if broker buying power is short.
+
+    strict=True (increase phase, reduces already filled) raises when buying
+    power cannot fund even MIN_NOTIONAL. strict=False (after-close single-phase
+    runs, where queued sells have not yet freed cash) drops the buys instead so
+    the next scheduled run retries once proceeds settle.
+    """
     if not buys:
         return buys
     bp = float(trading.get_account().buying_power) * BUY_POWER_BUFFER
@@ -302,10 +317,16 @@ def clip_buys_to_buying_power(
     if need <= bp or need <= 0:
         return buys
     if bp < MIN_NOTIONAL:
-        raise RuntimeError(
-            f"insufficient buying power ${bp:,.2f} for ${need:,.2f} of buys -- "
-            "reduces may not have filled yet"
+        if strict:
+            raise RuntimeError(
+                f"insufficient buying power ${bp:,.2f} for ${need:,.2f} of buys -- "
+                "reduces may not have filled yet"
+            )
+        print(
+            f"WARNING: buying power ${bp:,.2f} cannot fund ${need:,.2f} of "
+            "buys -- deferring buys to the next run"
         )
+        return []
     scale = bp / need
     print(
         f"NOTE: scaling buys by {scale:.3f} to fit buying power "
@@ -320,9 +341,25 @@ def clip_buys_to_buying_power(
     return out
 
 
+def _api_error_code(exc: APIError) -> int | None:
+    """APIError.code re-parses the response body and throws on non-JSON errors."""
+    try:
+        return int(exc.code)
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def submit_orders(
     trading: TradingClient, orders: list[dict], strategy: ModuleType
-) -> None:
+) -> list[dict]:
+    """Submit orders in sequence; return the ones actually accepted.
+
+    A buy the broker rejects for insufficient buying power is skipped (crypto
+    buys draw on settled cash, which the buying-power clip cannot see); the
+    next scheduled run re-plans and retries it. Any other reject aborts with
+    context on what was already submitted.
+    """
+    submitted: list[dict] = []
     for o in orders:
         sym = o["symbol"]
         tif = TimeInForce.GTC if strategy.SLEEVES[sym].crypto else TimeInForce.DAY
@@ -335,9 +372,25 @@ def submit_orders(
             request = MarketOrderRequest(
                 symbol=sym, notional=o["notional"], side=side, time_in_force=tif
             )
-        order = trading.submit_order(request)
+        try:
+            order = trading.submit_order(request)
+        except APIError as exc:
+            if o["action"] == "buy" and _api_error_code(exc) == ALPACA_INSUFFICIENT_BP:
+                print(
+                    f"WARNING: broker rejected buy {sym} "
+                    f"${o['notional']:,.2f} (insufficient buying power) -- "
+                    "skipping; next run will retry"
+                )
+                continue
+            done = ", ".join(f"{s['action']} {s['symbol']}" for s in submitted)
+            raise RuntimeError(
+                f"order submit failed for {o['action']} {sym} -- already "
+                f"submitted: {done or 'none'}"
+            ) from exc
+        submitted.append(o)
         detail = f"qty {o['qty']}" if o["action"] == "exit" else f"${o['notional']:,.2f}"
         print(f"submitted {o['action']:>4} {sym:<8} {detail}  (id {order.id})")
+    return submitted
 
 
 def _ensure_no_surprise_open_orders(
@@ -589,8 +642,14 @@ def run_account(
                     "duplicate run? aborting"
                 )
             else:
-                submit_orders(trading, to_submit, strategy)
-                submitted = list(to_submit)
+                # Runs happen after the close (daily-trade.yml, 6 PM ET), so the
+                # reduces queue for the next open and their proceeds are NOT in
+                # buying power yet. Clip buys to what the broker can fund now;
+                # the next daily run tops up once the sells fill.
+                submitted = submit_orders(trading, reduces, strategy)
+                still_buy = clip_buys_to_buying_power(trading, buys, strict=False)
+                if still_buy:
+                    submitted += submit_orders(trading, still_buy, strategy)
 
         elif resolved == "reduce":
             if open_orders(trading):
@@ -613,15 +672,12 @@ def run_account(
                         "buy_symbols": [o["symbol"] for o in buys],
                     },
                 )
-                submit_orders(trading, reduces, strategy)
-                submitted = list(reduces)
+                submitted = submit_orders(trading, reduces, strategy)
             elif reduces:
-                submit_orders(trading, reduces, strategy)
-                submitted = list(reduces)
+                submitted = submit_orders(trading, reduces, strategy)
             elif buys:
                 # Already have cash; no sell leg -- queue buys same session.
-                submit_orders(trading, buys, strategy)
-                submitted = list(buys)
+                submitted = submit_orders(trading, buys, strategy)
 
         else:  # increase
             allow = {o["symbol"] for o in reduces}
@@ -647,8 +703,7 @@ def run_account(
                     f"phase=increase: submitting {len(need_reduce)} missing reduce(s) "
                     "before buys"
                 )
-                submit_orders(trading, need_reduce, strategy)
-                submitted.extend(need_reduce)
+                submitted.extend(submit_orders(trading, need_reduce, strategy))
 
             if open_orders(trading):
                 if market_is_open(trading):
@@ -690,8 +745,7 @@ def run_account(
                         raise RuntimeError(
                             "open orders remain before buy submit -- aborting"
                         )
-                    submit_orders(trading, still_buy, strategy)
-                    submitted.extend(still_buy)
+                    submitted.extend(submit_orders(trading, still_buy, strategy))
                 clear_pending_rebalance(account.id)
                 equity, held = broker_state(trading, strategy)
                 orders = plan_orders(targets, held, equity, strategy)
@@ -782,7 +836,8 @@ def notify_run_failure(account_id: str | None = None) -> None:
         subject=f"[trading:{tag}] RUN FAILED | {date.today()}",
         text=(
             f"The daily trading run for account {tag} crashed before completing. "
-            "No orders were verified as placed -- check the GitHub Actions log.\n\n"
+            "Orders submitted before the crash (if any) are listed in the "
+            "traceback below and the GitHub Actions log -- reconcile manually.\n\n"
             + traceback.format_exc()
         ),
     )
